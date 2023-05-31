@@ -126,11 +126,12 @@ router.post("/login", async(req,res)=>{
                         _id:account.id,
                         firstName:account.firstName,
                         lastName:account.lastName,
-                        email:account.email
+                        email:account.email,
+                        isAdmin:account.isAdmin
                     }   
                     const token = await jwt.sign({dataToToken},process.env.JWT_KEY);
                     return res.status(200).json({
-                        message: token
+                        message: dataToToken //ask Eli how to work with passing token and decode in client side?
                     })
 
                 }

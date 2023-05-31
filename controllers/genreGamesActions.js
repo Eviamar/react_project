@@ -1,11 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import Game from '../models/account.js';
+import Game from '../models/game.js';
 import Genre from '../models/genre.js';
 const router = express.Router();
 
 router.post('/createGame',async(req,res)=>{
-    const game = req.body.game;
+    
+    const game = req.body;
+    console.log(`hello from createGame actions ${game.gameGallery}`)
     const id = new mongoose.Types.ObjectId();
     Game.findOne({gameName: game.gameName,gameReleaseDate:game.gameReleaseDate})
     .then(async g =>{
@@ -19,14 +21,16 @@ router.post('/createGame',async(req,res)=>{
         {
             const _newGame = new Game({
                 _id: id,
+                genreId:game.genreId,
+                addedBy:game.addedBy,
                 gameName:game.gameName,
                 gameDesc:game.gameDesc,
-                gameRating: game.gameRating,
+                //gameRating: game.gameRating,
                 gamePrice: game.gamePrice,
                 gameReleaseDate: game.gameReleaseDate,
                 gameImageCover:game.gameImageCover,
-                gameGallery: game.gameGallery,
-                gameReviews: []
+                gameGallery:game.gameGallery,
+                gameReviews:[]
             });
             _newGame.save()
             .then(results =>
@@ -42,7 +46,13 @@ router.post('/createGame',async(req,res)=>{
                 })
             })
         }
+    }).catch(error=>
+        {
+        return res.status(500).json({
+            message: error.message
+        })
     })
+    
     
 })
 

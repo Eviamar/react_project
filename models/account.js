@@ -9,11 +9,12 @@ const accountSchema = new Schema({
     password: String,
     verificationCode: Number,
     isVerified: {type: Boolean, default: false},
+    isAdmin:{type:Boolean,default: false},
     mobile: String,
     avatar: {type:String, default: "../client/src/avatar.png"},
-    gamesCollection:[{
+    gamesCollection:{
         gameId: {type: mongoose.Schema.Types.ObjectId,ref: 'Game'},
-    }]
+    }
 });
 
 export default mongoose.model('Account',accountSchema);

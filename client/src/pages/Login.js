@@ -1,11 +1,22 @@
 import React,{useState} from "react";
-import {Button,Container,Row,Col,Form,Card, } from 'react-bootstrap';
+import {Button,Container,Row,Col,Form, } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {ToastContainer,toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
+import logo from '../logo.png';
+
 
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom'
+
+// const user = {
+//   email:'',
+//   password:'',
+//   firstName:'',
+//   lastName:'',
+//   mobile:'',
+// } // use this instead of all the useStates for user
+
 
 const Login = props => {
     const navigate = useNavigate(); 
@@ -18,9 +29,12 @@ const Login = props => {
     const [mobile,setMobile] = useState("");
     const [authView,setAuthView] = useState("loginView"); // registerView //verifyView //recoverView
     const [code,setCode] = useState("");
+    
+
+    //const [userData,setUserData] = useState(user);
 
 
-
+  
 
     const getCode=async()=>{
       const user = 
@@ -81,6 +95,7 @@ const Login = props => {
         axios.put(baseUrl+"/account/verifyAccount",{verify})
         .then(result=>{
           toast.success(result.data.message);
+          setAuthView("loginView")
         })
         .catch(error=>{
           toast.error(error.message);
@@ -90,7 +105,7 @@ const Login = props => {
         toast.message("please type verification code")
       }
     }
-const createNewAccount = async()=>{
+    const createNewAccount = async()=>{
     if(email!="" && password.length>=8 && firstName!="" && lastName!="" && mobile.length==10)
     {
         const user = {
@@ -117,7 +132,7 @@ const createNewAccount = async()=>{
       else if(mobile.length!=10) toast.error("phone length must be 10 digits")
       else toast.error("All fields are required")
     }
-  }
+    }
 
     const loginfunc = async()=>{
         if(email!="" && password!="")
@@ -131,7 +146,7 @@ const createNewAccount = async()=>{
             .then(results =>{
               toast.success(`Welcome ${results.data.message}`);
               localStorage.setItem("user",JSON.stringify(results.data.message));
-              console.log(results.data.message);
+              //console.log(results.data.message);
               navigate('/dashboard');
               
             
@@ -146,29 +161,32 @@ const createNewAccount = async()=>{
         }
       }
 
+     
+
     return (
         <>
-
-            <Container>
+            <Container >
                 <ToastContainer/>
                 <Row>
                     <Col xl={4}></Col>
-                    <Col xl={4} style={{background:'#bebebe',borderRadius:20,padding:50,marginTop:100,textAlign:'center'}}>
-                        <img src="../../logo.png" style={{width:200}}/>
+                    <Col xl={4} style={{background:'rgba(155,155,155,0.96)',borderRadius:20,padding:50,marginTop:100,textAlign:'center'}}>
+                        <img src={logo} alt="logo" style={{width:200}}/>
                         {
                               authView === 'loginView' ? (<>
                               <Form>
                                 <Form.Label><h3>Login</h3></Form.Label>
                                 <Form.Group>
-                                    <Form.Control type="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email"style={{marginTop:10}} />
+                                    <Form.Control type="email" name="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email"style={{marginTop:10}} />
                                 </Form.Group>
                                 <Form.Group>
-                                    <Form.Control type="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type your password"style={{marginTop:10}}/>
+                                    <Form.Control type="password" name="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type your password"style={{marginTop:10}}/>
                                 </Form.Group>
-                                <Button variant="primary" onClick={loginfunc} style={{marginTop:12,width:'100%'}}>Sign in</Button>
-                                <Button variant="primary" onClick={()=> setAuthView("registerView")} style={{marginTop:12,width:'100%'}}>Register</Button>
-                                <Button variant="primary" onClick={()=> setAuthView("recoverView")} style={{marginTop:12,width:'100%'}}>Forgot password?</Button>
-                                <Button variant="primary" onClick={()=> setAuthView("verifyView")} style={{marginTop:12,width:'100%'}}>Verify account</Button>
+                                <Button variant="primary" onClick={loginfunc} style={{marginTop:12,width:'45%',marginRight:'10%'}}>Sign in</Button>
+                                <Button variant="primary" onClick={()=> setAuthView("registerView")} style={{marginTop:12,width:'45%'}}>Register</Button>
+                                
+                                <Button variant="btn btn-link" onClick={()=> setAuthView("recoverView")} style={{marginTop:12,width:'45%',marginRight:'10%',color:"#000"}}>Forgot password?</Button>
+                                <Button variant="btn btn-link" onClick={()=> setAuthView("verifyView")} style={{marginTop:12,width:'45%',color:"#000"}}>Verify account</Button>
+                                
                                 
                             </Form>
                               </>) 
@@ -176,56 +194,60 @@ const createNewAccount = async()=>{
                             <Form>
                                  <Form.Label><h3>Register</h3></Form.Label>
                                 <Form.Group>
-                                <Form.Control type="text" value={firstName} onChange={(e)=>{setFirstName(e.target.value)}} placeholder='First name' style={{marginTop:10}}/>
+                                <Form.Control type="text" name="firstName" value={firstName} onChange={(e)=>{setFirstName(e.target.value)}} placeholder='First name' style={{marginTop:10}}/>
                                 </Form.Group>
                                 <Form.Group>
-                                <Form.Control type="text" value={lastName} onChange={(e)=>{setlastName(e.target.value)}} placeholder='Last name' style={{marginTop:10}}/>
+                                <Form.Control type="text" name="lastName" value={lastName} onChange={(e)=>{setlastName(e.target.value)}} placeholder='Last name' style={{marginTop:10}}/>
                             </Form.Group>
                             <Form.Group>
-                                <Form.Control type="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email" style={{marginTop:10}}/>
+                                <Form.Control type="email" name="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email" style={{marginTop:10}}/>
                             </Form.Group>
                             <Form.Group>
-                                <Form.Control type="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type your password" style={{marginTop:10}}/>
+                                <Form.Control type="password" name="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type your password" style={{marginTop:10}}/>
                             </Form.Group>
                             <Form.Group>
-                            <Form.Control type="phone" value={mobile} onChange={(e)=>{setMobile(e.target.value)}} placeholder='Mobile' style={{marginTop:10}}/>
+                            <Form.Control type="phone"  name="mobile" value={mobile} onChange={(e)=>{setMobile(e.target.value)}} placeholder='Mobile' style={{marginTop:10}}/>
                             </Form.Group>
                             
-                            <Button variant="primary" onClick={createNewAccount} style={{marginTop:12,width:'100%'}}>Submit</Button>
-                            <Button variant="primary" onClick={()=>setAuthView("loginView")} style={{marginTop:12,width:'100%'}}>Back</Button>
+                            <Button variant="primary" onClick={createNewAccount}  style={{marginTop:12,width:'45%',marginRight:'10%'}}>Submit</Button>
+                            <Button variant="primary" onClick={()=>setAuthView("loginView")} style={{marginTop:12,width:'45%'}}>Back</Button>
                               </Form>
                             </>)
                             : authView === 'verifyView' ? (<>
                                 <Form>
                                   <Form.Label><h3>Verify</h3></Form.Label>
                                   <Form.Group>
-                                    <Form.Control type="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email"style={{marginTop:10}} />
+                                    <Form.Control type="email" name="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email"style={{marginTop:10}} />
                                 </Form.Group>
                                 <Form.Group>
-                                    <Form.Control type="number" value={code} onChange={(e)=> setCode(e.target.value)} placeholder="Type your code"style={{marginTop:10}} />
+                                    <Form.Control type="number" name="code" value={code} onChange={(e)=> setCode(e.target.value)} placeholder="Type your code"style={{marginTop:10}} />
                                 </Form.Group>
-                                <Button variant="primary" onClick={verifyMe} style={{marginTop:12,width:'100%'}}>Verify</Button>
-                                <Button variant="primary" onClick={()=>setAuthView("loginView")} style={{marginTop:12,width:'100%'}}>Back</Button>
+                                <Button variant="primary" onClick={verifyMe} style={{marginTop:12,width:'45%',marginRight:'10%'}}>Verify</Button>
+                                <Button variant="primary" onClick={()=>setAuthView("loginView")} style={{marginTop:12,width:'45%'}}>Back</Button>
                                  </Form>
                             </>)
                             :  (<>
-                            <Form>
+                             <Form>
                                  <Form.Label><h3>Recover</h3></Form.Label>
                                  <Form.Group>
-                                    <Form.Control type="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email"style={{marginTop:10}} />
+                                    <Form.Control type="email" name="email" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Type your email"style={{marginTop:10}} />
+                                </Form.Group>
+                                <Form.Group >
+                                  <Row >
+
+                                 
+                                    <Form.Control type="number" name="code" value={code} onChange={(e)=> setCode(e.target.value)} placeholder="Type your code" style={{marginTop:10,width:'40%'}} />
+                                    <Button variant="btn btn-link" onClick={getCode} style={{width:'40%'}}>Get Code</Button>
+                                    </Row>
                                 </Form.Group>
                                 <Form.Group>
-                                    <Form.Control type="number" value={code} onChange={(e)=> setCode(e.target.value)} placeholder="Type your code"style={{marginTop:10}} />
-                                    <Button variant="info" onClick={getCode}>Get Code</Button>
+                                    <Form.Control type="password" name="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type your new password"style={{marginTop:10}} />
                                 </Form.Group>
                                 <Form.Group>
-                                    <Form.Control type="password" value={password} onChange={(e)=> setPassword(e.target.value)} placeholder="Type your new password"style={{marginTop:10}} />
+                                    <Form.Control type="password" name="passwordConfirmation" value={passwordConfirmation} onChange={(e)=> setPasswordConfirmation(e.target.value)} placeholder="Confirm password"style={{marginTop:10}} />
                                 </Form.Group>
-                                <Form.Group>
-                                    <Form.Control type="password" value={passwordConfirmation} onChange={(e)=> setPasswordConfirmation(e.target.value)} placeholder="Confirm password"style={{marginTop:10}} />
-                                </Form.Group>
-                                <Button variant="primary" onClick={changePassword} style={{marginTop:12,width:'100%'}}>Confirm</Button>
-                                 <Button variant="primary" onClick={()=>setAuthView("loginView")} style={{marginTop:12,width:'100%'}}>Back</Button>
+                                 <Button variant="primary" onClick={changePassword} style={{marginTop:12,width:'45%',marginRight:'10%'}}>Confirm</Button>
+                                 <Button variant="primary" onClick={()=>setAuthView("loginView")} style={{marginTop:12,width:'45%'}}>Back</Button>
                                  </Form>
                             </>) 
                         }
