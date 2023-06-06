@@ -7,6 +7,7 @@ const Header = props =>{
   const user = JSON.parse(localStorage.getItem("user"));
 
   const navigate = useNavigate(); 
+  
   const logout = ()=>
   {
     localStorage.removeItem("user");

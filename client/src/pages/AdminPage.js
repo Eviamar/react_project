@@ -6,13 +6,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import Header from '../components/Header';
 import axios from 'axios';
 import GameItem from './../components/GameItem';
-
+import UserItem from './../components/UserItem';
 
 const AdminPage = props => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const baseUrl = 'http://localhost:3001/api';
   const [games,setAllGames] = useState([]);
+  const [users,setUsers] = useState([]);
   const [allGenres,setAllGenres] = useState([]);
   const [selectedGenre,setSelectedGenre] = useState("Select Genre");
   const [selectedGameName,setSelectedGameName] = useState("");
@@ -32,12 +33,24 @@ const AdminPage = props => {
   const preset_key = 'irkdzxu3';
   const cloud_name ='doaxabeif';
 
+  const AddNUpload = async ()=>
+  {
+  
+      const isUploaded = await uploadGameImagesTest();
+      console.log("isUploaded===>"+isUploaded);
+      if(isUploaded)
+        addNewGame();
+      else
+        toast.error("failed to upload");
+   
+  }
   const addNewGame = async()=>{
     
     if(selectedGenre!=="Select Genre")
     {
       if(selectedGameName!=="" && selectedGamePrice!=="" && selectedGameDesc!=="" && imageCoverFile!==null)
-      {
+      { 
+        
         
         
         //console.log('hello from addNewGame AdminPage')
@@ -81,6 +94,15 @@ const AdminPage = props => {
       toast.error("Please select genre")
     }
   }
+  
+  const loadAllUsers = async()=>
+  {
+    const response = await fetch(baseUrl+"/account/readAllUsers",{method:'GET'});
+    const data = await response.json();
+    setUsers(data.message);
+    //console.log(data);
+
+  }
 
   const loadAllGames = async()=>
   {
@@ -102,6 +124,7 @@ const AdminPage = props => {
   useEffect(()=>{
     loadAllGames();
     loadAllGenres();
+    loadAllUsers();
   },[]);
 
   const DeleteGameById = async(gid)=>{
@@ -122,9 +145,51 @@ const AdminPage = props => {
   //     [e.target.name]: e.target.value
   //   }))
   // }
+  const uploadGameImagesTest = async()=>
+  {
+    let cover = "";
+    let gallery = []
+    const formData = new FormData();
+    formData.append('file',imageCoverFile);
+      formData.append('upload_preset',preset_key);
+      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+    .then(async results =>
+    {
+      toast.success(`image cover successfully\n${results.data.secure_url}`)
+      cover = await results.data.secure_url;
+      //console.log(`Image Cover ===> ${selectedGameImage}`);
+      for(let i=0;i<galleryFiles.length;i++)
+      {
+      formData.append('file',galleryFiles[i]);
+      console.log("formData append ==> "+galleryFiles[i] );
+      formData.append('upload_preset',preset_key);
+      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+      .then(async results =>
+      {
+      toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
+      gallery.push(await results.data.secure_url);
+      console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
+      })
+    .catch(error=>
+      {
+      toast.error(error.message);
+      return false;
+      })
+    }
+    })
+    .catch(error=>
+    {
+      toast.error(error.message);
+      return false;
+    })
+    setSelectedGameGallery(gallery);
+    setSelectedGameImage(cover);
+    return true;
+  }
+
+
 
   const uploadGameImages = async ()=>{
-   
     //upload cover image
     const formData = new FormData();
       formData.append('file',imageCoverFile);
@@ -143,24 +208,23 @@ const AdminPage = props => {
     //upload gallery
     const formData2 = new FormData();
    for(let i=0;i<galleryFiles.length;i++)
-    {
+   {
       formData2.append('file',galleryFiles[i]);
       console.log("formData append ==> "+galleryFiles[i] );
       formData2.append('upload_preset',preset_key);
       axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData2)
-    .then(results =>
-    {
-      
+      .then(results =>
+      {
       toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
       setSelectedGameGallery(selectedGameGallery=>[...selectedGameGallery,{imageSource:results.data.secure_url,}])
       console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
-      
-    })
+      })
     .catch(error=>
-    {
+      {
       toast.error(error.message);
-    })
+      })
     }
+
     
   }
 
@@ -245,7 +309,7 @@ const AdminPage = props => {
       </Container>
     </Navbar>
            {
-            adminView ==="addGame" ? (<Form>
+            adminView ==="addGame" ? (<><h3>Add new game</h3><Form>
               <option>Select Genre</option>
               <Form.Select onChange={(e)=>{setSelectedGenre(e.target.value)}} aria-label="Default select example">
                 
@@ -272,14 +336,24 @@ const AdminPage = props => {
                {
                   selectedGameGallery.length > 0 && (selectedGameGallery.map(image=><><FormLabel>{image.imageSource}</FormLabel><br/><Image src={`${image.imageSource}`} style={{width:150,height:150,marginRight:2}}></Image><br/></>))
                 }<br/>
-                <Button style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={uploadGameImages}>Upload images</Button>
+                <Button style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={uploadGameImagesTest}>Upload images</Button>
                 <br/>
-                <Button variant='info'  style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={addNewGame}>Add Game</Button>
-              </Form>) :
-              adminView === "editGames" ?(<>{
+                <Button variant='info'  style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={AddNUpload}>Add Game</Button>
+              </Form></>) :
+              adminView === "editGames" ?(<><h3>Games</h3>{
                 games.length> 0 ? games.map((item)=> (<Col xl={3}><GameItem Delete= { () => {DeleteGameById(item._id)}} loadAllGames={loadAllGames} game={item} /></Col>)) : <p>no</p>
               } </>)
-              :(<></>)
+              :
+              (
+              <>
+              <h3>Users</h3>
+              <Row>
+              {
+                users.length > 0 && users.map((userItem)=>(<Col xl={4}><UserItem user={userItem}/></Col>))
+              }
+              </Row>
+              </>
+              )
            }
             </Container>  
        

@@ -87,7 +87,9 @@ const GameItem = props =>{
         
         </div>
         <>
-        
+        {
+          props.game.gameGallery.length>0 && (<><Card.Img src ={props.game.gameGallery[0]}/></>)
+        }
 
         </>
         {/* <Card.Img variant="top" src={props.game.gameGallery[0].imageSource} /> */}

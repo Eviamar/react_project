@@ -86,6 +86,19 @@ router.put('/updatePassword',async(req,res)=>{
     })
 })
 
+router.get('/readAllUsers',async(req,res)=>{
+    Account.find()
+    .then(userList=>{
+        return res.status(200).json({
+            message: userList
+        })
+    })
+    .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+})
 
 router.put('/verifyAccount',async(req,res)=>{
     const verify =  req.body.verify;
