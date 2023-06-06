@@ -140,7 +140,8 @@ router.post("/login", async(req,res)=>{
                         firstName:account.firstName,
                         lastName:account.lastName,
                         email:account.email,
-                        isAdmin:account.isAdmin
+                        mobile:account.mobile,
+                        isAdmin:account.isAdmin,
                     }   
                     const token = await jwt.sign({dataToToken},process.env.JWT_KEY);
                     return res.status(200).json({
@@ -181,4 +182,50 @@ function generateRandomIntegerInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+router.get('/readUserByID/:gid',async(req,res)=>{
+    Account.findById(req.params.gid)
+    .then(result=>{
+        return res.status(200).json({
+            message: result
+        })
+    })
+    .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
+
+
+    router.put('/updateUser/:gid',async(req,res)=>{
+        const user = req.body;
+        // let pw="";
+        // if(user.password!="")
+        // {
+        //     const hash = await bcryptjs.hash(user.password,10);
+        //     pw=hash;
+        // }
+        Account.findByIdAndUpdate(req.params.gid)
+        .then(x =>{
+            x.firstName = user.firstName
+            x.lastName = user.lastName
+            x.email = user.email
+            x.mobile = user.mobile
+            // if(pw!="")
+            // {
+            //     x.password = pw;
+            // }
+            x.save();
+            return res.status(200).json({
+                message: x
+            })
+        }
+        )
+        .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
+    
 export default router;
