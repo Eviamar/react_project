@@ -135,6 +135,7 @@ const Login = props => {
     }
 
     const loginfunc = async()=>{
+      localStorage.removeItem("user");
         if(email!="" && password!="")
         {
             const user = 

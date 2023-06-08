@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const GameItem = props =>{
   const baseUrl = 'http://localhost:3001/api';
   const [isEditable,setIsEditable] = useState(false);
+  
 
     return(
        <Card style={{marginLeft:2}}> 
@@ -22,9 +23,9 @@ const GameItem = props =>{
         <Card.Text>Email: {props.user.email}</Card.Text>
         <Card.Text>Phone: {props.user.mobile}</Card.Text>
         
-        {
-          props.user.gamesCollection.length >0 ? (<>there are items</>) :(<>user is poor and has no games</>)
-        }
+        {/* {
+          props.user.gamesCollection.length > 0 ? (<>there are items</>) :(<>user is poor and has no games</>)
+        } */}
           </Container>
         </Card.Body>
         </Card>

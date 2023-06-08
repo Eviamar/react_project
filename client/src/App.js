@@ -9,6 +9,7 @@ import AdminPage from './pages/AdminPage.js';
 
 
 import './App.css';
+import NotFound from './pages/NotFound.js';
 
 function App() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -17,13 +18,13 @@ function App() {
     <Router>
           <Routes>
             <Route path="/" element={<Login/>}/>
-            <Route path="/dashboard" element={user ? (<Dashboard/>) : (<Login/>)}/>
+            <Route path="/dashboard" exact element={user ? (<Dashboard/>) : (<Login/>)}/>
             <Route path="/game" element={user ? (<></>):(<Login/>)}/>
             <Route path="/cart" element={user ? (<></>):(<Login/>)}/>
-            <Route path="/gamesgallery" element={user ? (<></>):(<Login/>)}/>
-            <Route path="/settings" element={user ? (<Settings/>) : (<Login/>)}/>
-            <Route path="/admin" element={user ? ( user.isAdmin ? (<AdminPage/>) : (<Dashboard/>)) : (<Login/>)}/>
-            
+            <Route path="/gamesgallery"  element={user ? (<></>):(<Login/>)}/>
+            <Route path="/settings" exact element={user ? (<Settings/>) : (<Login/>)}/>
+            <Route path="/admin" exact element={user ? ( user.isAdmin ? (<AdminPage/>) : (<Dashboard/>)) : (<Login/>)}/>
+            <Route path="/*" element={<NotFound/>}/>
           </Routes>
         </Router>
     </>

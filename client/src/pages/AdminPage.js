@@ -33,25 +33,29 @@ const AdminPage = props => {
   const preset_key = 'irkdzxu3';
   const cloud_name ='doaxabeif';
 
-  const AddNUpload = async ()=>
-  {
+  useEffect(()=>{
+    loadAllGames();
+    loadAllGenres();
+    loadAllUsers();
+  },[]);
+
+  // const AddNUpload = async ()=>
+  // {
   
-      const isUploaded = await uploadGameImagesTest();
-      console.log("isUploaded===>"+isUploaded);
-      if(isUploaded)
-        addNewGame();
-      else
-        toast.error("failed to upload");
+  //     const isUploaded = await uploadGameImagesTest();
+  //     console.log("isUploaded===>"+isUploaded);
+  //     if(isUploaded)
+  //       addNewGame();
+  //     else
+  //       toast.error("failed to upload");
    
-  }
+  // }
   const addNewGame = async()=>{
     
     if(selectedGenre!=="Select Genre")
     {
       if(selectedGameName!=="" && selectedGamePrice!=="" && selectedGameDesc!=="" && imageCoverFile!==null)
       { 
-        
-        
         
         //console.log('hello from addNewGame AdminPage')
         const response = await fetch(baseUrl+"/createGame",{method:'POST',headers:{'Content-Type':'application/json'},
@@ -65,8 +69,6 @@ const AdminPage = props => {
           gameReleaseDate: selectedGameReleaseDate,
           gameImageCover: selectedGameImage,
           gameGallery: selectedGameGallery
-         
-        
         })  
         
       }
@@ -100,7 +102,7 @@ const AdminPage = props => {
     const response = await fetch(baseUrl+"/account/readAllUsers",{method:'GET'});
     const data = await response.json();
     setUsers(data.message);
-    //console.log(data);
+    //console.log(users);
 
   }
 
@@ -121,11 +123,7 @@ const AdminPage = props => {
 
   }
 
-  useEffect(()=>{
-    loadAllGames();
-    loadAllGenres();
-    loadAllUsers();
-  },[]);
+
 
   const DeleteGameById = async(gid)=>{
     const response = await fetch(baseUrl+"/deleteGame/"+gid,{method:'DELETE'});
@@ -145,47 +143,47 @@ const AdminPage = props => {
   //     [e.target.name]: e.target.value
   //   }))
   // }
-  const uploadGameImagesTest = async()=>
-  {
-    let cover = "";
-    let gallery = []
-    const formData = new FormData();
-    formData.append('file',imageCoverFile);
-      formData.append('upload_preset',preset_key);
-      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
-    .then(async results =>
-    {
-      toast.success(`image cover successfully\n${results.data.secure_url}`)
-      cover = await results.data.secure_url;
-      //console.log(`Image Cover ===> ${selectedGameImage}`);
-      for(let i=0;i<galleryFiles.length;i++)
-      {
-      formData.append('file',galleryFiles[i]);
-      console.log("formData append ==> "+galleryFiles[i] );
-      formData.append('upload_preset',preset_key);
-      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
-      .then(async results =>
-      {
-      toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
-      gallery.push(await results.data.secure_url);
-      console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
-      })
-    .catch(error=>
-      {
-      toast.error(error.message);
-      return false;
-      })
-    }
-    })
-    .catch(error=>
-    {
-      toast.error(error.message);
-      return false;
-    })
-    setSelectedGameGallery(gallery);
-    setSelectedGameImage(cover);
-    return true;
-  }
+  // const uploadGameImagesTest = async()=>
+  // {
+  //   let cover = "";
+  //   let gallery = []
+  //   const formData = new FormData();
+  //   formData.append('file',imageCoverFile);
+  //     formData.append('upload_preset',preset_key);
+  //     axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+  //   .then(async results =>
+  //   {
+  //     toast.success(`image cover successfully\n${results.data.secure_url}`)
+  //     cover = await results.data.secure_url;
+  //     //console.log(`Image Cover ===> ${selectedGameImage}`);
+  //     for(let i=0;i<galleryFiles.length;i++)
+  //     {
+  //     formData.append('file',galleryFiles[i]);
+  //     console.log("formData append ==> "+galleryFiles[i] );
+  //     formData.append('upload_preset',preset_key);
+  //     axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+  //     .then(async results =>
+  //     {
+  //     toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
+  //     gallery.push(await results.data.secure_url);
+  //     console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
+  //     })
+  //   .catch(error=>
+  //     {
+  //     toast.error(error.message);
+  //     return false;
+  //     })
+  //   }
+  //   })
+  //   .catch(error=>
+  //   {
+  //     toast.error(error.message);
+  //     return false;
+  //   })
+  //   setSelectedGameGallery(gallery);
+  //   setSelectedGameImage(cover);
+  //   return true;
+  // }
 
 
 
@@ -228,54 +226,54 @@ const AdminPage = props => {
     
   }
 
-  const uploadGameCover= (/*e*/)=>{
-    //const file = e.target.files[0];
-    //setImageCoverFile(file);
-    console.log("ImageCover==>"+imageCoverFile);
+  // const uploadGameCover= (/*e*/)=>{
+  //   //const file = e.target.files[0];
+  //   //setImageCoverFile(file);
+  //   console.log("ImageCover==>"+imageCoverFile);
 
-    const formData = new FormData();
-      formData.append('file',imageCoverFile);
-      formData.append('upload_preset',preset_key);
-      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
-    .then(results =>
-    {
-      toast.success(`image cover successfully\n${results.data.secure_url}`)
-      console.log("Image Cover ===> "+results.data.secure_url)
-      setSelectedGameImage(results.data.secure_url) 
-    })
-    .catch(error=>
-    {
-      toast.error(error.message);
-    })
+  //   const formData = new FormData();
+  //     formData.append('file',imageCoverFile);
+  //     formData.append('upload_preset',preset_key);
+  //     axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+  //   .then(results =>
+  //   {
+  //     toast.success(`image cover successfully\n${results.data.secure_url}`)
+  //     console.log("Image Cover ===> "+results.data.secure_url)
+  //     setSelectedGameImage(results.data.secure_url) 
+  //   })
+  //   .catch(error=>
+  //   {
+  //     toast.error(error.message);
+  //   })
     
     
-  }
-  const uploadGallery= (/*e*/ )=>{
-    //const files = e.target.files;
+  // }
+  // const uploadGallery= (/*e*/ )=>{
+  //   //const files = e.target.files;
     
-    console.log("Gallery==>"+galleryFiles.length);
+  //   console.log("Gallery==>"+galleryFiles.length);
     
-    const formData = new FormData();
-   for(let i=0;i<galleryFiles.length;i++)
-    {
-      formData.append('file',galleryFiles[i]);
-      console.log("formData append ==> "+galleryFiles[i] );
-      formData.append('upload_preset',preset_key);
-      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
-    .then(results =>
-    {
-      toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
-      console.log(results.data.secure_url);
-      setSelectedGameGallery(selectedGameGallery=>[...selectedGameGallery,{imageSource:results.data.secure_url,imageDesc:`test${i+1}`}])
+  //   const formData = new FormData();
+  //  for(let i=0;i<galleryFiles.length;i++)
+  //   {
+  //     formData.append('file',galleryFiles[i]);
+  //     console.log("formData append ==> "+galleryFiles[i] );
+  //     formData.append('upload_preset',preset_key);
+  //     axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+  //   .then(results =>
+  //   {
+  //     toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
+  //     console.log(results.data.secure_url);
+  //     setSelectedGameGallery(selectedGameGallery=>[...selectedGameGallery,{imageSource:results.data.secure_url,imageDesc:`test${i+1}`}])
       
-    })
-    .catch(error=>
-    {
-      toast.error(error.message);
-    })
-    }
+  //   })
+  //   .catch(error=>
+  //   {
+  //     toast.error(error.message);
+  //   })
+  //   }
     
-  }
+  // }
   const setCover =(e)=>{
     console.log("setCover==>"+e.target.files[0]);
     setImageCoverFile(e.target.files[0]);
@@ -284,9 +282,9 @@ const AdminPage = props => {
   const setGallery=(e)=>{
     setGalleryFiles(e.target.files);
   }
-  useEffect(() => {
-    console.log(`imageCoverFile changing: ${imageCoverFile}\ngalleryFiles changing: ${galleryFiles}`); 
-  }, [imageCoverFile,galleryFiles]);
+  // useEffect(() => {
+  //   console.log(`imageCoverFile changing: ${imageCoverFile}\ngalleryFiles changing: ${galleryFiles}`); 
+  // }, [imageCoverFile,galleryFiles]);
 
 
     return (
@@ -336,9 +334,9 @@ const AdminPage = props => {
                {
                   selectedGameGallery.length > 0 && (selectedGameGallery.map(image=><><FormLabel>{image.imageSource}</FormLabel><br/><Image src={`${image.imageSource}`} style={{width:150,height:150,marginRight:2}}></Image><br/></>))
                 }<br/>
-                <Button style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={uploadGameImagesTest}>Upload images</Button>
+                <Button style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={uploadGameImages}>Upload images</Button>
                 <br/>
-                <Button variant='info'  style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={AddNUpload}>Add Game</Button>
+                <Button variant='info'  style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={addNewGame}>Add Game</Button>
               </Form></>) :
               adminView === "editGames" ?(<><h3>Games</h3>{
                 games.length> 0 ? games.map((item)=> (<Col xl={3}><GameItem Delete= { () => {DeleteGameById(item._id)}} loadAllGames={loadAllGames} game={item} /></Col>)) : <p>no</p>
@@ -349,7 +347,7 @@ const AdminPage = props => {
               <h3>Users</h3>
               <Row>
               {
-                users.length > 0 && users.map((userItem)=>(<Col xl={4}><UserItem user={userItem}/></Col>))
+               users.length > 0 && users.map((userItem)=>(<Col xl={4}><UserItem user={userItem}/></Col>))
               }
               </Row>
               </>
