@@ -23,6 +23,7 @@ const AdminPage = props => {
   const [selectedGameGallery,setSelectedGameGallery] = useState([]);
   //const [selectedGameRating,setSelectedGameRating] = useState("");
   const [selectedGameReleaseDate,setSelectedGameReleaseDate] = useState("");
+  const [addBtn,setAddBtn] = useState(true);
 
   const [imageCoverFile,setImageCoverFile] =  useState(FileList | null);
   
@@ -79,6 +80,7 @@ const AdminPage = props => {
     //   console.log(selectedGameReleaseDate)
     
       toast.success(`Game ${data.message.gameName} Added`);
+      setAddBtn(!addBtn);
       // setSelectedGameName('')
       // setSelectedGameDesc('')
       // setSelectedGameRating('')
@@ -126,10 +128,38 @@ const AdminPage = props => {
 
 
   const DeleteGameById = async(gid)=>{
-    const response = await fetch(baseUrl+"/deleteGame/"+gid,{method:'DELETE'});
-    try{
-      const data = await response.json();
-      toast.success(`${data.message.gameName} has been deleted`)
+
+    const game = await fetch(baseUrl+"/readGameById/"+gid,{method:'GET'});
+    const gameData = await game.json();
+    // console.log("deleteGame==>"+JSON.stringify(gameData.message.gameImageCover))
+    // console.log("deleteGame2==>"+JSON.stringify(gameData.gameName))
+  
+    const formData = new FormData();
+    formData.append('folder',"Games/"+gameData.message.gameName);
+    
+    axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/destroy/`,formData)
+    .then(imageDel=>{
+      toast.success("image cover deleted");
+
+      // for(let i=0;i<gameData.message.gameGallery.length;i++){
+      //   axios.delete(gameData.message.gameGallery[i].imageSource).then(gallery=>{
+      //     toast.success(`image ${i+1}/${gameData.message.gameGallery.length} deleted`);
+      //   }).catch(error=>{
+      //     toast.error("galleryDel=>"+error.message);    
+      //     return;
+      //   })
+      // }
+     
+    }).catch(error=>{
+      toast.error("coverDel=>"+error.message);
+      
+      return;
+    })
+   
+     try{
+      const response = await fetch(baseUrl+"/deleteGame/"+gid,{method:'DELETE'});
+      //const data = await response.json();
+      toast.success(`${gameData.message.gameName} has been deleted`)
       loadAllGames();
     }catch(error){
       toast.error(error.message)
@@ -189,15 +219,22 @@ const AdminPage = props => {
 
   const uploadGameImages = async ()=>{
     //upload cover image
+    if(galleryFiles===0 || imageCoverFile===0){
+      toast.error("Images must be selected");
+      return;
+    }
+
     const formData = new FormData();
+    formData.append('folder',"Games/"+selectedGameName);
       formData.append('file',imageCoverFile);
       formData.append('upload_preset',preset_key);
-      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,formData)
+      axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload/`,formData)
     .then(results =>
     {
       toast.success(`image cover successfully\n${results.data.secure_url}`)
       setSelectedGameImage(results.data.secure_url);
       console.log(`Image Cover ===> ${selectedGameImage}`);
+      setAddBtn(!addBtn);
     })
     .catch(error=>
     {
@@ -205,6 +242,7 @@ const AdminPage = props => {
     })
     //upload gallery
     const formData2 = new FormData();
+    formData2.append('folder',"Games/"+selectedGameName);
    for(let i=0;i<galleryFiles.length;i++)
    {
       formData2.append('file',galleryFiles[i]);
@@ -218,11 +256,17 @@ const AdminPage = props => {
       console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
       })
     .catch(error=>
-      {
+      { 
       toast.error(error.message);
+      setAddBtn(false);
+
+      setSelectedGameImage("")
+      setSelectedGameGallery([])
+      setImageCoverFile(FileList | null);
+      setGalleryFiles(FileList | null);
       })
     }
-
+    
     
   }
 
@@ -310,6 +354,7 @@ const AdminPage = props => {
             adminView ==="addGame" ? (<><h3>Add new game</h3><Form>
               <option>Select Genre</option>
               <Form.Select onChange={(e)=>{setSelectedGenre(e.target.value)}} aria-label="Default select example">
+              <option selected>Select Genre</option>
                 
                 {
                   allGenres.length > 0 &&
@@ -327,16 +372,18 @@ const AdminPage = props => {
                 <Form.Control type="file" accept="image/*" name="gameImageCover" onChange={(e)=>{setCover(e)}} />
                 
                 {
-                  selectedGameImage!==""  && (<><FormLabel>{selectedGameImage}</FormLabel><br/><Image src={`${selectedGameImage}`} style={{width:150,height:150}}></Image></>)
+                  selectedGameImage!==""  && (<><Image title={selectedGameImage} src={`${selectedGameImage}`} style={{width:150,height:150}}></Image></>)
                 }<br/>
                 <Form.Label  style={{marginTop:10}}>Game Gallery</Form.Label>
                <Form.Control type="file" multiple accept="image/*" name="imageSource" onChange={(e)=>{setGallery(e)}} />
+               
                {
-                  selectedGameGallery.length > 0 && (selectedGameGallery.map(image=><><FormLabel>{image.imageSource}</FormLabel><br/><Image src={`${image.imageSource}`} style={{width:150,height:150,marginRight:2}}></Image><br/></>))
+                  selectedGameGallery.length > 0 && (selectedGameGallery.map(image=><><Image title={image.imageSource}src={`${image.imageSource}`} style={{width:150,height:150,marginRight:2}}></Image></>))
                 }<br/>
-                <Button style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={uploadGameImages}>Upload images</Button>
+                <Button disabled={!addBtn} style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={uploadGameImages}>Upload images</Button>
                 <br/>
-                <Button variant='info'  style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={addNewGame}>Add Game</Button>
+                
+                <Button disabled={addBtn} variant='info'  style={{marginTop:10,marginBottom:5,width:'25%',}} onClick={addNewGame} >Add Game</Button>
               </Form></>) :
               adminView === "editGames" ?(<><h3>Games</h3>{
                 games.length> 0 ? games.map((item)=> (<Col xl={3}><GameItem Delete= { () => {DeleteGameById(item._id)}} loadAllGames={loadAllGames} game={item} /></Col>)) : <p>no</p>

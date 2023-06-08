@@ -51,7 +51,7 @@ const GameItem = props =>{
             <Card style={{ marginTop:10 }}>
               
         <div style={{overflow:'hidden',width:'100%',height:180}} >
-        <Card.Img variant="top" src={props.game.gameImage}/>
+        <Card.Img variant="top" src={props.game.gameImageCover}/>
         
         </div>
         <Card.Body >
@@ -84,14 +84,14 @@ const GameItem = props =>{
                 <Card style={{ marginTop:10 }}>
         <div style={{overflow:'hidden',width:'100%',height:180}}>
         <Card.Img variant="top" src={props.game.gameImageCover} />
-        
+      
         </div>
-        <>
+        <div>
         {
-          props.game.gameGallery.length>0 && (<><Card.Img src ={props.game.gameGallery[0]}/></>)
+          GameGallery && (GameGallery.map((pic)=><Card.Img src={pic.imageSource} style={{width:75,height:75,marginRight:2}} onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>))
         }
 
-        </>
+        </div>
         {/* <Card.Img variant="top" src={props.game.gameGallery[0].imageSource} /> */}
         <Card.Body >
           <Card.Title >{props.game.gameName} | Rating: {props.game.gameRating}</Card.Title>
