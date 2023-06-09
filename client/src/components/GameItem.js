@@ -4,18 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-const game = {
-  gameGenre:'',
-  gameName:'',
-  gamePrice:'',
-  gameDesc:'',
-  gameImageCover:'',
-  gameGallery:[{imageSource:'',}],
-  gameRaters:'',
-  gameRating:'',
-  gameReleaseDate:'',
-  gameReviews:[{createdAt:'',title:'',review:'',userAuthor:'',isCommitedReview:''}],
-}
+
 
 const GameItem = props =>{
   const baseUrl = 'http://localhost:3001/api';

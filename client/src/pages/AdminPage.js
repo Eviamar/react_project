@@ -81,12 +81,14 @@ const AdminPage = props => {
     
       toast.success(`Game ${data.message.gameName} Added`);
       setAddBtn(!addBtn);
-      // setSelectedGameName('')
-      // setSelectedGameDesc('')
-      // setSelectedGameRating('')
-      // setSelectedGamePrice('')
-      // setSelectedGameReleaseDate('')
-      // setSelectedGameImage('')
+      setSelectedGameImage("")
+      setSelectedGameGallery([])
+      setSelectedGameName('')
+      setSelectedGameDesc('')
+     // setSelectedGameRating('')
+      setSelectedGamePrice('')
+      setSelectedGameReleaseDate('')
+      setSelectedGameImage('')
       loadAllGames();
       }
       else
@@ -258,15 +260,13 @@ const AdminPage = props => {
     .catch(error=>
       { 
       toast.error(error.message);
-      setAddBtn(false);
-
-      setSelectedGameImage("")
-      setSelectedGameGallery([])
-      setImageCoverFile(FileList | null);
-      setGalleryFiles(FileList | null);
       })
     }
-    
+    setAddBtn(false);
+
+      
+      setImageCoverFile(FileList | null);
+      setGalleryFiles(FileList | null);
     
   }
 

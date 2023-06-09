@@ -25,7 +25,10 @@ router.post("/createAccount", async(req,res)=>{
                     email: user.email,
                     password: hash,
                     verificationCode: generateRandomIntegerInRange(1000,9999),
-                    mobile: user.mobile,   
+                    mobile: user.mobile,
+                    avatar:'../client/src/avatar.png',
+                    gamesCollection:[]
+
                 }
             );
             _account.save()
@@ -228,4 +231,41 @@ router.get('/readUserByID/:gid',async(req,res)=>{
     })
     })
     
+    router.put('/updateUserImage/:gid',async(req,res)=>{
+        const user = req.body;
+        Account.findByIdAndUpdate(req.params.gid)
+        .then(x =>{
+            x.avatar = user.avatar
+            x.save();
+            return res.status(200).json({
+                message: x
+            })
+        }
+        )
+        .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
+
+
+    router.put('/addGameToCollection/:gid',async(req,res)=>{
+        const user = req.body;
+
+        Account.findByIdAndUpdate(req.params.gid)
+        .then(x =>{
+            x.gamesCollection = [...x.gamesCollection,{ gameId: user.gameId}]
+            x.save();
+            return res.status(200).json({
+                message: x
+            })
+        }
+        )
+        .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
 export default router;
