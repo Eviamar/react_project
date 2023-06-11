@@ -2,17 +2,26 @@ import React, { useState,useEffect } from 'react';
 import {Button,Container,Row,Col,Form,Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Carousel from 'react-bootstrap/Carousel';
-import { set } from 'mongoose';
+import {ToastContainer,toast} from 'react-toastify'
 
 
 const GameComponent = (props) =>{
-
+    const [allReviews,setAllReviews] = useState(props.game.gameReviews);
     const [game,setGame] = useState();
     const [gameDate,setGameDate] = useState("");
     const baseUrl = 'http://localhost:3001/api';
-    
+    const [reviewBtnDisabled,setReviewBtnDisabled] = useState(false);
+    const [title,setTitle] = useState("");
+    const [review,setReview] = useState("");
+    const [userRating,setUserRating] = useState(0);
+    const [addReview,setAddReview] = useState(false);
+    const Rate = Array.from({length: 10}, (_, i) => i + 1);
+    const [userName,setUserName] = useState(""); 
+
+
+
     const GetGameData = async()=>{
-        const response = await fetch(baseUrl+"/readGameById/"+props.game._id,{method:'GET'});
+    const response = await fetch(baseUrl+"/readGameById/"+props.game._id,{method:'GET'});
     const data = await response.json();
     setGame(data.message);
     const date = new Date(data.message.gameReleaseDate);
@@ -33,8 +42,44 @@ const GameComponent = (props) =>{
     }
     useEffect(()=>{
         GetGameData();
-        
+        setReviewBtnDisabled(CheckIfCommitedReview);
     },game,)
+ 
+    const CheckIfCommitedReview=()=>{
+      const reviews = props.game.gameReviews;
+      for(let i=0; i<reviews.length;i++){
+        if(reviews[i].userAuthor===JSON.parse(localStorage.getItem("user"))._id)
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+    const CommitReview = async()=>{
+      if(CheckIfCommitedReview)
+      {
+        toast.error("Already commited");
+        return;
+      }
+      const response = await fetch(baseUrl+"/AddReview/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        userAuthor: JSON.parse(localStorage.getItem("user"))._id,
+        title: title,
+        review:review,
+        userRating:parseInt(userRating)
+            
+      })});
+      const data = await response.json(); 
+      toast.success("Review saved, thank you")
+      setAddReview(!addReview);
+    }
+
+const GetUserNameByID=async(uid)=>{
+  const response = await fetch(baseUrl+"/account/readUserByID"+uid,{method:'GET'});
+    const data = await response.json();
+    console.log("username"+data.message.userName)
+    return data.message.userName;
+    //console.log(users);
+}
     return(
 <>
 {
@@ -90,8 +135,59 @@ const GameComponent = (props) =>{
                   <Container>
                     <Row>
                   </Row>
+                  
                   <Row style={{justifyContent:'space-evenly'}}>
-                  <Button variant='dark' style={{width:'20%'}}>&#128196;</Button><Button variant='dark' style={{width:'20%'}} onClick={()=>AddToCart(props.game)}>🛒</Button>
+                    {
+                      addReview  ?
+                     
+                       (<>
+                        {
+                        !reviewBtnDisabled &&   (<Form>
+                          <Row>
+                          <Col>
+                          <Form.Control type="text" placeholder='Title' onChange={(e)=>setTitle(e.target.value)}/>
+                          </Col>
+                          <Col>
+                          <Form.Select  onChange={(e)=>{setUserRating(e.target.value)}} aria-label="Default select example">
+                          <option selected>Select Rating</option>
+                          {
+                            Rate.length > 0 &&
+                            Rate.map((rate) => (<option value={rate}>{rate}</option>))
+                          }
+                </Form.Select></Col></Row>
+                
+                          <textarea style={{width:'100%'}} type="text" placeholder='Review' onChange={(e)=>setReview(e.target.value)}/>
+                          
+                          <Row style={{justifyContent:'space-evenly'}}>
+                            <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button><Button  style={{width:'30%'}} variant='success' onClick={CommitReview} disabled={reviewBtnDisabled}>&#x2714;</Button>
+                          </Row>
+                          </Form>)
+                        }
+                       
+                       
+
+                        {
+                           reviewBtnDisabled && (<><h6>Reviews:</h6>
+                          <Carousel >
+                          {
+                            allReviews.length>0 && allReviews.map((review)=>(
+                              <Carousel.Item  >
+                            <Card style={{backgroundColor:'#bebebebe'}}>
+                              <Card.Body>
+                                <Card.Title>Title: {review.title}</Card.Title>
+                                <Card.Text>Rating: {review.userRating}</Card.Text>
+                                <textarea disabled style={{resize:'none'}} value={review.review}></textarea>
+                                </Card.Body></Card></Carousel.Item>
+                                ))
+                          }
+                          </Carousel> <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button></>)
+                        }
+                        
+                        </>) :
+                      
+                      (<><Button variant='dark' style={{width:'20%'}} onClick={()=>setAddReview(!addReview)}>&#128196;</Button><Button variant='dark' style={{width:'20%'}} onClick={()=>AddToCart(props.game)}>🛒</Button>
+                      </>) 
+                    }
                   </Row>
                   </Container>
                 </Card.Body>

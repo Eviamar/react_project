@@ -54,13 +54,13 @@ const Dashboard = props => {
         <ToastContainer/>
             <Container style={{alignSelf:'center',width:'100%',background:'rgba(255,255,255,0.95)',borderWidth:5,borderColor:"#000",marginTop:'2%',borderRadius:18}}>
 
-           hi {JSON.stringify(user)}
+           <h1>Games</h1>
             <Row className="justify-content-md-center">
                 {
                     games.length> 0 ? games.map((item)=> (<Col xl="3"  ><GameComponent loadAllGames={loadAllGames} game={item}/></Col>)) : <p>no</p>
                 } 
             </Row>
-            {cartItems}<Button onClick={()=>{localStorage.removeItem("Cart")}}>empty cart</Button>
+           
             </Container>
                
 

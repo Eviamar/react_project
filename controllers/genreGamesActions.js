@@ -78,6 +78,26 @@ router.post('/createGenre',async(req,res)=>{
     })
 })
 
+router.put('/updateGenre/:gid',async(req,res)=>{
+    const {genreName,genreDesc} = req.body;
+    Genre.findByIdAndUpdate(req.params.gid)
+    .then(x =>{
+        x.genreName = genreName
+        x.genreDesc = genreDesc
+        x.save();
+        return res.status(200).json({
+            message: x
+        })
+    }
+    )
+    .catch(error =>{
+    return res.status(500).json({
+        message: error.message
+    })
+})
+})
+
+
 router.get('/readAllGames',async(req,res)=>{
     Game.find()
     .then(gameList=>{
@@ -143,22 +163,16 @@ router.put('/updateGame/:gid',async(req,res)=>{
 })
 })
 
-function formatDate(date) {
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    minutes = minutes < 10 ? '0'+minutes : minutes;
-    var strTime = hours + ':' + minutes + ' ' + ampm;
-    return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
-  }
 
 
 router.get('/readGameById/:gid',async(req,res)=>{
 Game.findById(req.params.gid)
 .then(result=>{
-    
+    if(result===null)
+    return res.status(404).json({
+        message: false
+    })
+
     return res.status(200).json({
         message: result
     })
@@ -200,6 +214,25 @@ router.get('/readGameByGenre/:genid',async(req,res)=>{
 
 })
 
+router.put('/AddReview/:gid',async(req,res)=>{
+    const review = req.body;
+    Game.findByIdAndUpdate(req.params.gid)
+    .then(x =>{
+        x.gameReviews = [...x.gameReviews,{userAuthor:review.userAuthor,title:review.title,review:review.review,userRating:review.userRating,isCommitedReview:true}],
+        x.gameRaters = x.gameRaters+1,
+        x.gameRating = x.gameRating+review.userRating
+        x.save();
+        return res.status(200).json({
+            message: x
+        })
+    }
+    )
+    .catch(error =>{
+    return res.status(500).json({
+        message: error.message
+    })
+})
+})
 
     
 export default router;

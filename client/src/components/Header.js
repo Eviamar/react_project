@@ -32,7 +32,6 @@ const Header = props =>{
               <NavDropdown.Item href="/cart">
                 Cart
               </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Your games</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={logout}>
                 Logout

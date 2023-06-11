@@ -37,7 +37,7 @@ const Settings = props => {
       {
         toast.success(`image cover successfully`)
         setAvatar(results.data.secure_url);
-        console.log(`user Cover ===> ${avatar}`);
+       // console.log(`user Cover ===> ${avatar}`);
         
         
       })
@@ -81,7 +81,7 @@ const Settings = props => {
       const response = await fetch(baseUrl+"/account/readUserByID/"+gid,{method:'GET'});
       const data = await response.json();
       setUserData(data.message);
-      console.log("LoadUserData===>"+JSON.stringify(userData));
+      //console.log("LoadUserData===>"+JSON.stringify(userData));
       
     //   setFirstName(userData.firstName);
     //   setLastName(userData.lastName);
@@ -99,7 +99,7 @@ const Settings = props => {
         <Header/>
        <ToastContainer/>
         <Container style={{alignSelf:'center',width:'100%',background:'rgba(255,255,255,0.95)',borderWidth:5,borderColor:"#000",marginTop:'2%',borderRadius:12,paddingBottom:5,paddingTop:5}}>
-<p>{JSON.stringify(user)}</p>
+<h1>Your account Info</h1>
 {userData !=null && (
 <>
 
@@ -110,7 +110,7 @@ const Settings = props => {
             <Card style={{ margin:10,}}>
             <Row>
           <Col xl={2} >
-        <Card.Img style={{width:150,height:150,}}  src={userData.avatar}/>
+        <Card.Img style={{width:150,height:150,borderTopRightRadius:0,borderBottomLeftRadius:0}}  src={userData.avatar}/>
         <label>Choose new avatar</label>
         <Form.Control type="file" accept="image/*" name="gameImageCover" onChange={(e)=>{uploadUserImage(e)}} />
         <Button variant="success" style={{marginTop:10}} onClick={updateUserImage}>Save avatar</Button> 
@@ -142,11 +142,14 @@ const Settings = props => {
           </Row>
 
         </Card.Body>
+        
         </Col>
+        
         </Row>
       </Card>
-
-          <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{width:'100%'}}>Back</Button>
+      <Row style={{justifyContent:'center'}}>
+      <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{width:'15%'}}>« Back</Button>
+      </Row>
        
             </>
           ) 
@@ -157,7 +160,7 @@ const Settings = props => {
                     <Row>
                     <Col xl={2} >
        
-                    <Card.Img style={{width:150,height:150,}}  src={userData.avatar}/>
+                    <Card.Img style={{width:150,height:150,borderTopRightRadius:0,borderBottomLeftRadius:0}}  src={userData.avatar}/>
         
         </Col>
         <Col xl={3}>
@@ -187,7 +190,7 @@ const Settings = props => {
       <h3 style={{textAlign:'center'}}>Game Collection</h3><br/>
       <Row>
             {
-             userData && userData.gamesCollection.length > 0 ? (userData.gamesCollection.map((item)=><Col xl={4} style={{marginBottom:10}}><GameCard game={item}/></Col>)) : (<>No games</>)
+             userData && userData.gamesCollection.length > 0 ? (userData.gamesCollection.map((item)=><Col xl={3} style={{marginBottom:10}}><GameCard game={item}/></Col>)) : (<>No games</>)
             } 
       </Row>
       </Container>

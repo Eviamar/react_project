@@ -1,16 +1,22 @@
 import React, { useState,useEffect } from 'react';
-import {Button,Container,Row,Col,Form,Card } from 'react-bootstrap';
+import {Button,Container,Row,Col,Form,Card,Carousel } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ToastContainer } from 'react-toastify';
 
 const GameCard = (props) =>{
-
+const [gameDate,setGameDate]= useState("");
     const [game,setGame] = useState();
     const baseUrl = 'http://localhost:3001/api';
-    
     const GetGameData = async()=>{
-        const response = await fetch(baseUrl+"/readGameById/"+props.game.gameId,{method:'GET'});
+    const response = await fetch(baseUrl+"/readGameById/"+props.game.gameId,{method:'GET'});
     const data = await response.json();
-    setGame(data.message);
+    if(data.message!==false)
+    {
+      setGame(data.message);
+      const date = new Date(data.message.gameReleaseDate);
+      setGameDate(date.toLocaleDateString('en-GB').toString());
+    
+    }
     }
 
   
@@ -21,32 +27,51 @@ const GameCard = (props) =>{
     },game,)
     return(
 <>
-{
-    game && (<Card style={{ marginTop:10 }}>
-        <div style={{overflow:'hidden',width:'100%',height:180}}>
-        <Card.Img variant="top" src={game.gameImageCover} />
-      
-        </div>
-        <div>
-        {
-          game.gameGallery && (game.gameGallery.map((pic)=><Card.Img src={pic.imageSource} style={{width:75,height:75,marginRight:2}} onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>
-          
-          ))
-        }
+<ToastContainer/>
 
-        </div>
-        <Card.Body>
-                  <Card.Title >{game.gameName} {game.gameReleaseDate} {isNaN(props.game.gameRating/props.game.gameRaters) ?(<>0</>) :(<>{props.game.gameRating/props.game.gameRaters}</>)}</Card.Title>
-                  
-                  <Card.Text style={{borderTopWidth:1,borderColor:"#000",borderTopStyle:'dashed',borderBottomWidth:1,borderBottomStyle:'dashed'}}>
-                    
-                  {game.gameDesc}
-                  </Card.Text>
-                  <Container>
-                    <Row>
-                  </Row>
-                  </Container>
-                </Card.Body>
+{
+    game && (<Card style={{ marginTop:10,marginBottom:10,borderWidth:1,borderColor:'#000',boxShadow:10,boxShadow: '1px 1px 12px #000'}}>
+      
+     
+    <Card>
+    <Card.Img style={{height:150,borderBottomLeftRadius:0,borderBottomRightRadius:0,}} src={game.gameImageCover} />
+    <Card.ImgOverlay>
+     <Row xl={12}style={{width:'100%',height:"100%",}}>
+      <Col xl={8} > <Card.Text style={{fontSize:26,color:'white',fontWeight:'800',textShadow:'1px 3px 3px #000',borderRadius:6,}}>
+        {game.gameName}</Card.Text></Col>
+      
+      </Row>
+        </Card.ImgOverlay>
+        </Card>
+        <Container >
+        <Row >
+          <Col>
+          <Card.Text style={{fontSize:16,fontWeight:'bold',textShadow:'1px 3px 3px #bebebe'}}>
+          Release Date
+          </Card.Text>
+          </Col>
+          <Col>
+          <Card.Text style={{fontSize:16,textAlign:'right',fontWeight:'bold',textShadow:'1px 3px 3px #bebebe'}}>
+          Rating
+          </Card.Text>
+          </Col>
+        </Row>
+        <Row >
+          <Col style={{width:'80%',}} >
+    <Card.Text style={{fontSize:13,}}>{gameDate}</Card.Text>
+    </Col>
+    <Col style={{width:'30%' ,}}>
+     <Card.Text style={{fontSize:13,textAlign:'right'}}>{isNaN(props.game.gameRating/props.game.gameRaters) ?(<>0</>) :(<>{props.game.gameRating/props.game.gameRaters}</>)}&#127942;</Card.Text>
+     </Col>
+    </Row>
+    </Container>
+    <Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double'}}>
+    {
+      game.gameGallery && (game.gameGallery.map((pic)=><Carousel.Item style={{width:"100%",height:150,}}><Card.Img style={{borderRadius:0}}src={pic.imageSource}  onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>
+      </Carousel.Item>
+      ))
+    }
+    </Carousel>
               </Card>
              )
 }

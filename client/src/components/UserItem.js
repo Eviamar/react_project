@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
-const GameItem = props =>{
+const UserItem = props =>{
   const baseUrl = 'http://localhost:3001/api';
   const [isEditable,setIsEditable] = useState(false);
   
@@ -16,7 +16,7 @@ const GameItem = props =>{
         <Card.Body>
         <Container>
         <Card.Title style={{textAlign:'center'}}>{props.user.firstName} {props.user.lastName}</Card.Title> 
-          <Card.Img variant="top" src={props.user.avatar}></Card.Img>
+          <Card.Img variant="top" src={props.user.avatar} style={{width:150,height:150}}></Card.Img>
         <Card.Text>{props.user._id}</Card.Text>
         <Card.Text>Admin: {props.user.isAdmin ? (<>yes</>):(<>no</>)}</Card.Text>
         <Card.Text>Activated: {props.user.isVerified ? (<>yes</>):(<>no</>)}</Card.Text>
@@ -27,10 +27,14 @@ const GameItem = props =>{
           props.user.gamesCollection.length > 0 ? (<>there are items</>) :(<>user is poor and has no games</>)
         } */}
           </Container>
+          <Row style={{justifyContent:'space-evenly',marginTop:10}}>
+          <Button variant='dark' style={{width:'30%'}}>Edit</Button>{props.user.isAdmin ? (<Button disabled style={{width:'30%'}} variant='danger'>Delete</Button>):(<Button style={{width:'30%'}} variant='danger'>Delete</Button>)}
+          </Row>
         </Card.Body>
+        
         </Card>
         
     )
 }
 
-export default GameItem;
+export default UserItem;
