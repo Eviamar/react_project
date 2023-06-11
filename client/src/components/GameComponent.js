@@ -43,7 +43,7 @@ const GameComponent = (props) =>{
     useEffect(()=>{
         GetGameData();
         setReviewBtnDisabled(CheckIfCommitedReview);
-    },game,)
+    },game,reviewBtnDisabled)
  
     const CheckIfCommitedReview=()=>{
       const reviews = props.game.gameReviews;
@@ -56,11 +56,7 @@ const GameComponent = (props) =>{
       return false;
     }
     const CommitReview = async()=>{
-      if(CheckIfCommitedReview)
-      {
-        toast.error("Already commited");
-        return;
-      }
+      
       const response = await fetch(baseUrl+"/AddReview/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
         userAuthor: JSON.parse(localStorage.getItem("user"))._id,
         title: title,
@@ -120,29 +116,30 @@ const GetUserNameByID=async(uid)=>{
          </Col>
         </Row>
         </Container>
-        <Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double'}}>
-        {
-          game.gameGallery && (game.gameGallery.map((pic)=><Carousel.Item style={{width:"100%",height:150,}}><Card.Img style={{borderRadius:0}}src={pic.imageSource}  onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>
-          </Carousel.Item>
-          ))
-        }
-        </Carousel>
-        
-        
-        
-        <Card.Body>
-                    <textarea value={game.gameDesc} style={{color:'#000',resize:'none',backgroundColor:'#bebebebe',width:'100%',height:100,borderTopWidth:1,borderColor:"#000",borderStyle:'dashed',borderBottomWidth:1}}disabled></textarea>
-                  <Container>
-                    <Row>
-                  </Row>
-                  
-                  <Row style={{justifyContent:'space-evenly'}}>
-                    {
-                      addReview  ?
-                     
-                       (<>
-                        {
-                        !reviewBtnDisabled &&   (<Form>
+
+        { 
+                            //if user already commited review
+                           addReview && reviewBtnDisabled ? 
+                           (<>
+                          <Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double'}}>
+                          {
+                            allReviews.length>0 && allReviews.map((review)=>(
+                              <Carousel.Item  style={{width:"100%",height:150,}}>
+                            <Card style={{backgroundColor:'#bebebebe'}}>
+                              <Card.Body>
+                                <Card.Title>Title: {review.title}</Card.Title>
+                                <Card.Text>Rating: {review.userRating}</Card.Text>
+                                <textarea disabled style={{resize:'none'}} value={review.review}></textarea>
+                                </Card.Body></Card></Carousel.Item>
+                                ))
+                          }
+                          </Carousel> </>) : 
+
+                          //if user didnt commit review yet
+                          addReview && !reviewBtnDisabled ? 
+                          (<>
+                          <div style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double',}}>
+                          <Form style={{width:"100%",height:150,}}>
                           <Row>
                           <Col>
                           <Form.Control type="text" placeholder='Title' onChange={(e)=>setTitle(e.target.value)}/>
@@ -156,32 +153,38 @@ const GetUserNameByID=async(uid)=>{
                           }
                 </Form.Select></Col></Row>
                 
-                          <textarea style={{width:'100%'}} type="text" placeholder='Review' onChange={(e)=>setReview(e.target.value)}/>
+                          <textarea style={{width:'100%',resize:"none",height:'74%'}} type="text" placeholder='Review' onChange={(e)=>setReview(e.target.value)}/>
                           
-                          <Row style={{justifyContent:'space-evenly'}}>
-                            <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button><Button  style={{width:'30%'}} variant='success' onClick={CommitReview} disabled={reviewBtnDisabled}>&#x2714;</Button>
-                          </Row>
-                          </Form>)
+                          
+                          </Form>
+                          </div> </>) :
+                          (<><Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double'}}>
+        {
+          game.gameGallery && (game.gameGallery.map((pic)=><Carousel.Item style={{width:"100%",height:150,}}><Card.Img style={{borderRadius:0, height:150}}src={pic.imageSource}  onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>
+          </Carousel.Item>
+          ))
+        }
+        </Carousel></>)
                         }
-                       
-                       
+        
+        <Card.Body>
+                    <textarea value={game.gameDesc} style={{color:'#000',resize:'none',backgroundColor:'#bebebebe',width:'100%',height:100,borderTopWidth:1,borderColor:"#000",borderStyle:'dashed',borderBottomWidth:1}}disabled></textarea>
+                  <Container>
+                    <Row>
+                  </Row>
+                  
+                  <Row style={{justifyContent:'space-evenly'}}>
+                    {
+                      addReview  ?
+                     
+                       (<>
 
                         {
-                           reviewBtnDisabled && (<><h6>Reviews:</h6>
-                          <Carousel >
-                          {
-                            allReviews.length>0 && allReviews.map((review)=>(
-                              <Carousel.Item  >
-                            <Card style={{backgroundColor:'#bebebebe'}}>
-                              <Card.Body>
-                                <Card.Title>Title: {review.title}</Card.Title>
-                                <Card.Text>Rating: {review.userRating}</Card.Text>
-                                <textarea disabled style={{resize:'none'}} value={review.review}></textarea>
-                                </Card.Body></Card></Carousel.Item>
-                                ))
-                          }
-                          </Carousel> <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button></>)
+                          addReview && reviewBtnDisabled ? (<><Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button></>) : (<><Row style={{justifyContent:'space-evenly'}}>
+                          <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button><Button  style={{width:'30%'}} variant='success' onClick={CommitReview} disabled={reviewBtnDisabled}>&#x2714;</Button>
+                        </Row></>)
                         }
+                        
                         
                         </>) :
                       
