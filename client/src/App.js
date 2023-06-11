@@ -10,6 +10,7 @@ import AdminPage from './pages/AdminPage.js';
 
 import './App.css';
 import NotFound from './pages/NotFound.js';
+import Cart from './pages/Cart.js';
 
 function App() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -20,7 +21,7 @@ function App() {
             <Route path="/" element={<Login/>}/>
             <Route path="/dashboard" exact element={user ? (<Dashboard/>) : (<Login/>)}/>
             <Route path="/game" element={user ? (<></>):(<Login/>)}/>
-            <Route path="/cart" element={user ? (<></>):(<Login/>)}/>
+            <Route path="/cart" element={user ? (<Cart></Cart>):(<Login/>)}/>
             <Route path="/gamesgallery"  element={user ? (<></>):(<Login/>)}/>
             <Route path="/settings" exact element={user ? (<Settings/>) : (<Login/>)}/>
             <Route path="/admin" exact element={user ? ( user.isAdmin ? (<AdminPage/>) : (<Dashboard/>)) : (<Login/>)}/>

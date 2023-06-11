@@ -10,7 +10,7 @@ const Header = props =>{
   
   const logout = ()=>
   {
-    localStorage.removeItem("user");
+    localStorage.clear();
     navigate('/')
   }
 
@@ -29,7 +29,7 @@ const Header = props =>{
               {
               user.isAdmin && (<NavDropdown.Item href="/admin">Admin Page</NavDropdown.Item>) 
             }
-              <NavDropdown.Item href="#action/3.2">
+              <NavDropdown.Item href="/cart">
                 Cart
               </NavDropdown.Item>
               <NavDropdown.Item href="#action/3.3">Your games</NavDropdown.Item>

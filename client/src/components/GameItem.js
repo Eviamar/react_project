@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {Button,Container,Row,Col,Form,Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -17,6 +17,7 @@ const GameItem = props =>{
   const [GameGallery,setGameGallery] = useState(props.game.gameGallery);
   const [GameRating,setGameRating] = useState(props.game.gameRating);
   const [GameReleaseDate,setGameReleaseDate] = useState(props.game.gameReleaseDate);
+
 
   const updateGame = async()=>{
     const response = await fetch(baseUrl+"/updateGame/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
@@ -83,7 +84,7 @@ const GameItem = props =>{
         </div>
         {/* <Card.Img variant="top" src={props.game.gameGallery[0].imageSource} /> */}
         <Card.Body >
-          <Card.Title >{props.game.gameName} | Rating: {props.game.gameRating}</Card.Title>
+          <Card.Title >{props.game.gameName} | Rating: {isNaN(props.game.gameRating/props.game.gameRaters) ?(<>0</>) :(<>{props.game.gameRating/props.game.gameRaters}</>)}</Card.Title>
           <Card.Text style={{borderTopWidth:1,borderColor:"#000",borderTopStyle:'dashed',borderBottomWidth:1,borderBottomStyle:'dashed'}}>
            <p style={{color:'green'}}>Price: ${props.game.gamePrice}</p>
           {props.game.gameDesc}

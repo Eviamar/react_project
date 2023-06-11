@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import {Button,Container,Row,Col,Form,Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const GameCard = (props) =>{
+const GamePage = (props) =>{
 
     const [game,setGame] = useState();
     const baseUrl = 'http://localhost:3001/api';
@@ -55,4 +55,4 @@ const GameCard = (props) =>{
     )
 }
 
-export default GameCard;
+export default GamePage;
