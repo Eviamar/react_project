@@ -155,8 +155,8 @@ const filter = async()=>{
               <Button variant='dark' style={{width:'5%'}} onClick={loadAllGames}>↻</Button>
               </Row>
            </Form>
-
-            <Row className="justify-content-md-center">
+                {/*className="justify-content-md-center"*/}
+            <Row  style={{}}>
         
                 {
                       ( games.length> 0 && games.map((item)=> (<Col xl="3"  ><GameComponent loadAllGames={loadAllGames} game={item}/></Col>))) 

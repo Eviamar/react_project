@@ -134,34 +134,35 @@ const AdminPage = props => {
 
   const DeleteGameById = async(gid)=>{
 
-    const game = await fetch(baseUrl+"/readGameById/"+gid,{method:'GET'});
-    const gameData = await game.json();
-    // console.log("deleteGame==>"+JSON.stringify(gameData.message.gameImageCover))
-    // console.log("deleteGame2==>"+JSON.stringify(gameData.gameName))
-  
-    const formData = new FormData();
-    formData.append('folder',"Games/"+gameData.message.gameName);
-    
-    axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/destroy/`,formData)
-    .then(imageDel=>{
-      toast.success("image cover deleted");
-
-      // for(let i=0;i<gameData.message.gameGallery.length;i++){
-      //   axios.delete(gameData.message.gameGallery[i].imageSource).then(gallery=>{
-      //     toast.success(`image ${i+1}/${gameData.message.gameGallery.length} deleted`);
-      //   }).catch(error=>{
-      //     toast.error("galleryDel=>"+error.message);    
-      //     return;
-      //   })
-      // }
      
-    }).catch(error=>{
-      toast.error("coverDel=>"+error.message);
+    // // console.log("deleteGame==>"+JSON.stringify(gameData.message.gameImageCover))
+    // // console.log("deleteGame2==>"+JSON.stringify(gameData.gameName))
+  
+    // // const formData = new FormData();
+    // // formData.append('folder',"Games/"+gameData.message.gameName);
+    
+    // // axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/destroy/`,formData)
+    // // .then(imageDel=>{
+    // //   toast.success("image cover deleted");
+
+    // //   // for(let i=0;i<gameData.message.gameGallery.length;i++){
+    // //   //   axios.delete(gameData.message.gameGallery[i].imageSource).then(gallery=>{
+    // //   //     toast.success(`image ${i+1}/${gameData.message.gameGallery.length} deleted`);
+    // //   //   }).catch(error=>{
+    // //   //     toast.error("galleryDel=>"+error.message);    
+    // //   //     return;
+    // //   //   })
+    // //   // }
+     
+    // // }).catch(error=>{
+    // //   toast.error("coverDel=>"+error.message);
       
-      return;
-    })
+    //   return;
+    // })
    
      try{
+      const game = await fetch(baseUrl+"/readGameById/"+gid,{method:'GET'});
+      const gameData = await game.json();
       const response = await fetch(baseUrl+"/deleteGame/"+gid,{method:'DELETE'});
       //const data = await response.json();
       toast.success(`${gameData.message.gameName} has been deleted`)
