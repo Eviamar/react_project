@@ -63,19 +63,62 @@ setIsEditable(false);
     
  
 }
+
+  const updatePassword=async ()=>{
+    try{
+      if(newPassword.length<8 && confirmNewPassword<8){
+        toast.error("Password must be 8digit long at least!")
+        return;
+      }
+      if(newPassword!==confirmNewPassword){
+        toast.error("new passwords not match!")
+        return;
+      }
+      
+      const isMatch = await fetch(baseUrl+"/account/checkPassword/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        password: oldPassword,
+     
+    })});
+    const data = await isMatch.json();
+    
+     if(data.message)
+     {
+        const response = await fetch(baseUrl+"/account/updateUserPassword/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          password: confirmNewPassword,
+        })});
+          const data = await response.json();
+          if(data)
+            toast.success("Password updated!");
+
+    
+     }
+     else{
+      toast.error("Old passsword is incorrect!");
+      return;
+     }
+     
+     
+    }catch(error){
+      console.log();
+    }
+  }
     const updateUser = async()=>{  
  try{
+  if(firstName.length<2 || lastName.length<2 || mobile.length!==10 || email==="" )
+  {
+    toast.error("All fields are required!\nName and lastname must be at least 2letter long\nEmail is required!\nMobile has to be 10digit")
+   return;
+  }
   const response = await fetch(baseUrl+"/account/updateUser/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
     firstName: firstName,
     lastName: lastName,
     email: email,
     mobile: mobile,
-    //password:newPassword
 })});
 const data = await response.json(); 
 user = JSON.parse(localStorage.getItem("user"));
 loadUserData(user._id);
-toast.success("changed")
+toast.success("User updated")
 setIsEditable(false);
  }catch(error){
   console.log(error)
@@ -90,15 +133,16 @@ setIsEditable(false);
         setUserData(data.message);
         //console.log("LoadUserData===>"+JSON.stringify(userData));
         
-      //   setFirstName(userData.firstName);
-      //   setLastName(userData.lastName);
-      //   setEmail(userData.email);
-      //   setMobile(userData.mobile);
+        setFirstName(userData.firstName);
+        setLastName(userData.lastName);
+        setEmail(userData.email);
+        setMobile(userData.mobile);
       }catch(error){
        console.log(error)
       }
       
     }
+    
 
     useEffect(()=>{
         loadUserData(user._id);
@@ -124,7 +168,7 @@ setIsEditable(false);
         <Card.Img style={{width:150,height:150,borderTopRightRadius:0,borderBottomLeftRadius:0}}  src={userData.avatar}/>
         <label>Choose new avatar</label>
         <Form.Control type="file" accept="image/*" name="gameImageCover" onChange={(e)=>{uploadUserImage(e)}} />
-        <Button variant="success" style={{marginTop:10}} onClick={updateUserImage}>✔Save avatar✔</Button> 
+        <Button variant="success" style={{marginTop:10}} onClick={updateUserImage}>Save avatar</Button> 
         </Col>
         <Col xl={9}>
         <Card.Body >
@@ -136,7 +180,7 @@ setIsEditable(false);
           <Form.Control type="text" value={lastName} onChange={(e)=>{setLastName(e.target.value)}} placeholder='Last name' style={{marginTop:10}}/>
           <Form.Control type="email" value={email} onChange={(e)=>{setEmail(e.target.value)}} placeholder='Email' style={{marginTop:10}}/>
           <Form.Control type="phone" value={mobile} onChange={(e)=>{setMobile(e.target.value)}} placeholder='Mobile' style={{marginTop:10}}/>
-          <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{marginTop:10}}>✔Save info✔</Button>
+          <Button variant="primary" onClick={updateUser} style={{marginTop:10}}>Save info</Button>
           </Col>
           {/* <Col xl={2}>
             <Row>
@@ -148,7 +192,7 @@ setIsEditable(false);
           <Form.Control type="phone" value={oldPassword} onChange={(e)=>{setOldPassword(e.target.value)}} placeholder='Old password' style={{marginTop:10}}/>
           <Form.Control type="phone" value={newPassword} onChange={(e)=>{setNewPassword(e.target.value)}} placeholder='New password' style={{marginTop:10}}/>
           <Form.Control type="phone" value={confirmNewPassword} onChange={(e)=>{setConfirmNewPassword(e.target.value)}} placeholder='Confirm password' style={{marginTop:10}}/>
-          <Button variant='danger' style={{marginTop:10}}>Update Password</Button>
+          <Button variant='danger' style={{marginTop:10}} onClick={updatePassword}>Update Password</Button>
           </Col>
           </Row>
 

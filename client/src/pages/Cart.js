@@ -18,15 +18,21 @@ const Cart = props => {
   
 
     const [totalCost,setTotalCost] = useState(0);
-
+    const [isCartLoaded,SetIsCartLoaded] = useState(false)
 
  const [cartItems,setCartItems] = useState([]);
 
  const itemsInCart = localStorage.getItem("Cart");
 
+
+
   const getGameData = async() =>
   {
-    if(!localStorage.Cart)
+    if(!localStorage.Cart){
+        toast.error("Cart is empty!")
+        return;
+    }
+    if(isCartLoaded)
         return;
     const itemsInLocalStorage = itemsInCart.substring(1,localStorage.Cart.length);
     const listOfIDs = itemsInLocalStorage.split(',');
@@ -39,7 +45,7 @@ const Cart = props => {
         cost+= data.message.gamePrice;
         setTotalCost(cost);
     }
-    
+    SetIsCartLoaded(true);
     
   }
 
@@ -74,21 +80,27 @@ const RemoveItem=(item)=>{
     for(let i = 0; i< cartItems.length;i++)
         localStorage.setItem("Cart",[localStorage.Cart,JSON.stringify(cartItems[i]._id)]);
     //console.log(localStorage.Cart)
+    window.location.reload(false);
 }
 
 const EmptyCart =() =>{
     localStorage.removeItem("Cart")
     getGameData();
+    window.location.reload(false);
 }
+
+useEffect(()=>{
+    
+},[""])
     return (
         <>
         <Header/>
         <ToastContainer/>
-            <Container style={{alignSelf:'center',width:'100%',background:'rgba(255,255,255,0.95)',borderWidth:5,borderColor:"#000",marginTop:'2%',borderRadius:18}}>
+            <Container  style={{alignSelf:'center',width:'100%',background:'rgba(255,255,255,0.95)',borderWidth:5,borderColor:"#000",marginTop:'2%',borderRadius:18}}>
 
-           hi Cart {cartItems.length} <br></br>
-        <Button onClick={getGameData}>Load cart</Button>
+           {/* hi Cart {cartItems.length} <br></br> */}
         <h1>Items in cart:</h1>
+        <Button onClick={getGameData}>Load cart</Button>
             <Row className="justify-content-md-center" style={{width:'100%'}} >
                 {
                     cartItems.length> 0 ? cartItems.map((item)=> (<><Col xl={3}  style={{width:250,marginBottom:10}}>
@@ -107,7 +119,7 @@ const EmptyCart =() =>{
                    </>)
                    ) 
                     : 
-                    <p>Cart is empty</p>
+                    <p>Your cart is empty, go back and add some games!</p>
                 } <Row/>
 
                {

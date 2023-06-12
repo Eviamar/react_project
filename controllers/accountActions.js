@@ -199,25 +199,82 @@ router.get('/readUserByID/:gid',async(req,res)=>{
     })
     })
 
-
-    router.put('/updateUser/:gid',async(req,res)=>{
+    
+    router.put('/adminUpdateUser/:gid',async(req,res)=>{
         const user = req.body;
-        // let pw="";
-        // if(user.password!="")
-        // {
-        //     const hash = await bcryptjs.hash(user.password,10);
-        //     pw=hash;
-        // }
         Account.findByIdAndUpdate(req.params.gid)
         .then(x =>{
             x.firstName = user.firstName
             x.lastName = user.lastName
             x.email = user.email
             x.mobile = user.mobile
-            // if(pw!="")
-            // {
-            //     x.password = pw;
-            // }
+            x.isAdmin = user.isAdmin,
+            x.isVerified = user.isVerified
+            x.save();
+            return res.status(200).json({
+                message: x
+            })
+        }
+        )
+        .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
+    router.put('/updateUser/:gid',async(req,res)=>{
+        const user = req.body;
+        Account.findByIdAndUpdate(req.params.gid)
+        .then(x =>{
+            x.firstName = user.firstName
+            x.lastName = user.lastName
+            x.email = user.email
+            x.mobile = user.mobile
+            x.save();
+            return res.status(200).json({
+                message: x
+            })
+        }
+        )
+        .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
+
+
+    router.put('/checkPassword/:gid',async(req,res)=>{
+        const user = req.body;
+    Account.findById(req.params.gid)
+    .then(async result=>{
+         const isMatch = await bcryptjs.compare(user.password,result.password); 
+        if(isMatch)
+        return res.status(200).json({
+            message: true
+        })
+        else{
+             return res.status(200).json({
+            message: false
+        })
+        }
+    })
+    .catch(error =>{
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+    })
+
+
+
+
+    router.put('/updateUserPassword/:gid',async(req,res)=>{
+        const user = req.body;
+        const hash = await bcryptjs.hash(user.password,10);
+        Account.findByIdAndUpdate(req.params.gid)
+        .then(x =>{
+            x.password = hash;
             x.save();
             return res.status(200).json({
                 message: x

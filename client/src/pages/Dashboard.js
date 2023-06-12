@@ -16,7 +16,7 @@ const Dashboard = props => {
   const [selectedGenre,setSelectedGenre] = useState("Select Genre");
   const [games,setAllGames] = useState([]);
   const [allGenres,setAllGenres] = useState([]);
-  const [chosenRate,setChosenRate] = useState();
+  const [chosenRate,setChosenRate] = useState(1);
   const Rate = Array.from({length: 10}, (_, i) => i + 1);
 
   
@@ -24,21 +24,59 @@ const Dashboard = props => {
  
   const [filterView,setFilterView] = useState("Select Genre");
 
+  const [selectedPrice,setSelectedPrice] = useState(0);
+  const [selectedGameName,setSelectedGameName] = useState("");
+
+
+const filter = async()=>{
+  console.log(`chosenRate=>${typeof(chosenRate)} ${chosenRate}`)
+  console.log(`chosenRate=>${typeof(selectedPrice)} ${selectedPrice}`)
+  try{
+    let gameList = games;
+    setAllGames([]);
+    if(selectedGameName!==""){
+      
+      const results = await gameList.filter(game=>  game.gameName.toLowerCase().includes(selectedGameName.toLowerCase()) );
+      if(results.length===0){
+        toast.error("nothing found");
+        loadAllGames();
+      }
+      setAllGames(results);
+    }
+    else if(parseInt(selectedPrice)>0){
+      const results = await gameList.filter(game=>  game.gamePrice<=parseInt(selectedPrice) );
+      if(results.length===0){
+        toast.error("nothing found");
+        loadAllGames();
+      }
+      setAllGames(results);
+    }
+    else if(parseInt(chosenRate)>0){
+      const results = await gameList.filter(game=>  Math.floor(game.gameRating/game.gameRaters)===parseInt(chosenRate));
+      if(results.length===0){
+        toast.error("nothing found");
+        loadAllGames();
+      }
+      setAllGames(results);
+    }
+     else{
+      loadAllGames();
+     }
+     setChosenRate(1);
+     setSelectedPrice(0);
+     setSelectedGameName("");
+
+  }catch(error){
+    console.log(error)
+  }
+}
 
   const loadAllGames = async()=>
   {
     try{
-        if(filterView==="Select Genre")
-        {
-
-            setAllGames([]);
             const response = await fetch(baseUrl+"/readAllGames",{method:'GET'});
             const data = await response.json();
-            setAllGames(await data.message);
-            //console.log(data);
-        }
-        else
-            FilterView();
+            setAllGames(data.message);
     }catch(error){
         console.log(error);
     }
@@ -46,6 +84,7 @@ const Dashboard = props => {
    
   
   }
+  
   const loadAllGenres = async()=>
   {
     try{
@@ -63,30 +102,22 @@ const Dashboard = props => {
   useEffect(()=>{
       loadAllGames();
       loadAllGenres();
-      
       setCardItems(localStorage.getItem("Cart"));
       
     },[]);
     
     
-    const FilterView=async()=>{
-      console.log(selectedGenre)
-      console.log(filterView)
-
+    const FilterView=async(e)=>{
         try{
-            if(selectedGenre!=="Select Genre")
-            {
-                allGenres.map((x)=>{if(selectedGenre===x._id) {setFilterView( x.genreName);}});
-                setAllGames([]);
-                const response = await fetch(baseUrl+"/readGameByGenre/"+selectedGenre,{method:'GET'});
-                const data = await response.json();
-                
-                setAllGames(await data.message);
-                
+            if(e==="Select Genre"){
+              loadAllGames();
+              return;
             }
-            else
-                loadAllGames();
-            
+            allGenres.map((x)=>{if(e===x._id) {setFilterView( x.genreName);}});
+            setAllGames([]);
+            const response = await fetch(baseUrl+"/readGameByGenre/"+e,{method:'GET'});
+            const data = await response.json();
+            setAllGames(await data.message);
         }catch(error){
             console.log(error)
         }
@@ -97,19 +128,23 @@ const Dashboard = props => {
         <Header/>
         <ToastContainer/>
             <Container style={{alignSelf:'center',width:'100%',background:'rgba(255,255,255,0.95)',borderWidth:5,borderColor:"#000",marginTop:'2%',borderRadius:18}}>
-
+          
            <h1>Games</h1>
-           <Form style={{padding:10,}}><Row style={{justifyContent:'space-evenly'}}>
-            <Form.Control type="text" placeholder='Name' style={{width:'30%'}}/>
-            <Form.Control type="number" placeholder='Price range' style={{width:'15%'}}/>
-            <Form.Select style={{width:'15%'}}  onChange={(e)=>{setChosenRate(e.target.value)}} aria-label="Default select example">
-                          <option selected>Select Rating</option>
+           <Form style={{padding:10,}}>
+            <Row style={{justifyContent:'space-evenly'}} xl={50}>
+           
+            <Form.Control type="text" placeholder='Name' value={selectedGameName} onChange={(e)=>setSelectedGameName(e.target.value)} style={{width:'30%'}}/>
+            <Form.Control type="number" placeholder='Price range' value={selectedPrice} onChange={(e)=>{setSelectedPrice(e.target.value)}} style={{width:'15%'}}/>
+            <Form.Select style={{width:'15%'}} value={chosenRate}  onChange={(e)=>{setChosenRate(e.target.value)}} aria-label="Default select example">
+                          
                           {
                             Rate.length > 0 &&
                             Rate.map((rate) => (<option value={rate}>{rate}</option>))
                           }
                 </Form.Select>
-            <Form.Select style={{width:'20%'}} onChange={(e)=>{setSelectedGenre(e.target.value)}} aria-label="Default select example">
+                <Button variant='dark' style={{width:'15%'}} onClick={filter}>Filter</Button>
+              
+            <Form.Select style={{width:'15%'}} onChange={(e)=>{FilterView(e.target.value)}} aria-label="Default select example">
               <option selected>Select Genre</option>
                 
                 {
@@ -117,7 +152,8 @@ const Dashboard = props => {
                   allGenres.map((genre) => (<option value={genre._id}>{genre.genreName}</option>))
                 }
               </Form.Select>
-              <Button variant='dark' style={{width:'10%'}} onClick={FilterView}>Filter</Button></Row>
+              <Button variant='dark' style={{width:'5%'}} onClick={loadAllGames}>↻</Button>
+              </Row>
            </Form>
 
             <Row className="justify-content-md-center">

@@ -9,6 +9,7 @@ const GameComponent = (props) =>{
     const [allReviews,setAllReviews] = useState(props.game.gameReviews);
     const [game,setGame] = useState();
     const [gameDate,setGameDate] = useState("");
+    const [gameReviewDate,setGameReviewDate] = useState("");
     const baseUrl = 'http://localhost:3001/api';
     const [reviewBtnDisabled,setReviewBtnDisabled] = useState(false);
     const [title,setTitle] = useState("");
@@ -18,6 +19,18 @@ const GameComponent = (props) =>{
     const Rate = Array.from({length: 10}, (_, i) => i + 1);
     // const [userName,setUserName] = useState(""); 
 
+
+const ReviewDates = ()=>{
+  let reviewDates = new Array({});
+  let  date ;
+  allReviews.forEach(element => {
+    date = new Date(element.createdAt);
+    reviewDates.push({createdAt: date.toLocaleDateString('en-GB').toString(),userAuthor: element.userAuthor})
+  });
+  setGameReviewDate(reviewDates);
+  //console.log(gameReviewDate)
+  
+}
 
 
     const GetGameData = async()=>{
@@ -40,7 +53,7 @@ const GameComponent = (props) =>{
       
     localStorage.setItem("Cart",[localStorage.Cart,JSON.stringify(item._id)]);
     //console.log("TotalItems=>"+totalItems);
-    console.log("Cart=>"+localStorage.getItem("Cart"));
+    //console.log("Cart=>"+localStorage.getItem("Cart"));
     toast.success(`${item.gameName} Added to cart`);
     
  
@@ -48,20 +61,47 @@ const GameComponent = (props) =>{
     useEffect(()=>{
         GetGameData();
         setReviewBtnDisabled(CheckIfCommitedReview);
-    },game,reviewBtnDisabled)
+        ReviewDates()
+    },[])
  
     const CheckIfCommitedReview=()=>{
-      const reviews = props.game.gameReviews;
-      for(let i=0; i<reviews.length;i++){
-        if(reviews[i].userAuthor===JSON.parse(localStorage.getItem("user"))._id)
-        {
-          return true;
+      try{
+        const reviews = props.game.gameReviews;
+        for(let i=0; i<reviews.length;i++){
+          if(reviews[i].userAuthor===JSON.parse(localStorage.getItem("user"))._id)
+          {
+            return true;
+          }
         }
+        return false;
+      }catch(error){
+        console.log(error)
       }
-      return false;
+      
     }
     const CommitReview = async()=>{
       try{
+      
+       if(userRating<1 || userRating>10){
+         toast.error("Please select rating");
+         return;
+       }
+
+        if(title==="" || review==="" )
+        {
+          toast.error("Please fill all fields to commit a review");
+          return;
+          
+        }
+        if(title.length<2 || review.length<6)
+          {
+            toast.error("Title/review too short");
+            return;
+          }
+          if(title>20 || review.length>200){
+            toast.error("Title/review too long\nTitle needs to be 20letters long\nReview needs to be 200letters long");
+            return;
+          }
         const response = await fetch(baseUrl+"/AddReview/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
           userAuthor: JSON.parse(localStorage.getItem("user"))._id,
           title: title,
@@ -141,7 +181,7 @@ const GameComponent = (props) =>{
                                
                                 <Card.Title style={{textDecoration:' underline dotted #2c8fe6',fontSize:23,fontWeight:'650',marginTop:'-7%',textShadow:'2px 0px white'}}>{review.title}</Card.Title>
                                 <Card.Text style={{fontSize:15,fontWeight:'800',textShadow:'1px 1px 10px gold'}}>{review.userRating}🏆</Card.Text>
-                               
+                                
                                 <textarea disabled style={{color:'#000',resize:'none',width:'100%',height:80,borderRadius:8,marginTop:'-5%',textAlign:'center',}} value={review.review}></textarea>
                                 </Card.Body></Card></Carousel.Item>
                                 ))
