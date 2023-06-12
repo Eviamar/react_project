@@ -8,9 +8,14 @@ const GamePage = (props) =>{
     const baseUrl = 'http://localhost:3001/api';
     
     const GetGameData = async()=>{
+      try{
         const response = await fetch(baseUrl+"/readGameById/"+props.game.gameId,{method:'GET'});
-    const data = await response.json();
-    setGame(data.message);
+        const data = await response.json();
+        setGame(data.message);
+      }catch(error){
+       console.log(error)
+      }
+      
     }
 
   

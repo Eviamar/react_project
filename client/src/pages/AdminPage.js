@@ -238,7 +238,7 @@ const AdminPage = props => {
     {
       toast.success(`image cover successfully\n${results.data.secure_url}`)
       setSelectedGameImage(results.data.secure_url);
-      console.log(`Image Cover ===> ${selectedGameImage}`);
+      //console.log(`Image Cover ===> ${selectedGameImage}`);
       setAddBtn(!addBtn);
     })
     .catch(error=>
@@ -258,7 +258,7 @@ const AdminPage = props => {
       {
       toast.success(`image ${i+1} uploaded successfully\n${results.data.secure_url}`)
       setSelectedGameGallery(selectedGameGallery=>[...selectedGameGallery,{imageSource:results.data.secure_url,}])
-      console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
+      //console.log("gallery image"+i+"==> "+selectedGameGallery[i]);
       })
     .catch(error=>
       { 
@@ -340,6 +340,11 @@ const EditGenreBtn =(e) =>
  
 }
 const AddGenre=async()=>{
+  if(genreName!=="" || genreDesc!=="")
+  {
+    toast.error("Insert genre name/description!")
+    return;
+  }
   const response = await fetch(baseUrl+"/createGenre",{method:'POST',headers:{'Content-Type':'application/json'},
           body : JSON.stringify({
           genreName:genreName,
@@ -359,6 +364,11 @@ const AddGenre=async()=>{
 }
 
 const updateGenre = async()=>{
+  if(genreName.length===0|| genreDesc.length===0)
+  {
+    toast.error("Insert genre name/description!")
+    return;
+  }
   const response = await fetch(baseUrl+"/updateGenre/"+selectedGenre,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
     genreName: genreName,
     genreDesc: genreDesc,
@@ -402,7 +412,7 @@ switch(e){
            
            <Navbar bg="light" expand="lg" >
       <Container >
-        <Navbar.Brand ></Navbar.Brand>
+        <Navbar.Brand >Admin tools</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
@@ -476,18 +486,21 @@ switch(e){
               adminView==="GenrePage" && (
               <>
               <Row style={{justifyContent:'space-evenly'}}>
-                <Col xl={4} style={{padding:10,background:'rgba(155,155,155,0.3)',borderWidth:1,borderRadius:18}}><h3>Add Genre</h3>
+                <Col xl={4} style={{padding:10,background:'rgba(155,155,155,0.3)',borderWidth:1,borderRadius:18,marginBottom:10}}><h3>Add Genre</h3>
                <Form>
       <Form.Group style={{marginBottom:10}}>
-        <Form.Control type="text" placeholder="Enter genre name" onChange={(e)=>setGenreName(e.target.value)} />
+      <FloatingLabel label="Genre name">
+        <Form.Control type="text" placeholder="Enter genre name" onChange={(e)=>setGenreName(e.target.value)} /></FloatingLabel>
       </Form.Group>
-      <Form.Control type="textarea" placeholder="Type genre description" onChange={(e)=>setGenreDesc(e.target.value)} />
+      <FloatingLabel label="Genre description">
+      <Form.Control type="textarea" placeholder="Type genre description" onChange={(e)=>setGenreDesc(e.target.value)} /></FloatingLabel>
       <Form.Group className="mb-3" controlId="formBasicCheckbox">
       </Form.Group>
-      <Button variant="primary"  onClick={AddGenre}>Add</Button>
+      <Row style={{justifyContent:'space-evenly'}}>
+      <Button variant="dark" style={{width:'50%'}} onClick={AddGenre}>Add genre</Button></Row>
     </Form>
     </Col>
-    <Col xl={5} style={{padding:10,background:'rgba(155,155,155,0.3)',borderWidth:1,borderRadius:18}}>
+    <Col xl={5} style={{padding:10,background:'rgba(155,155,155,0.3)',borderWidth:1,borderRadius:18,marginBottom:10}}>
       <h3>Edit Genre</h3>
       {
         genreEditBtn ? (<><Form.Select  style={{marginBottom:10}} onChange={(e)=>{setSelectedGenre(e.target.value)}} aria-label="Default select example">
@@ -498,15 +511,19 @@ switch(e){
             allGenres.map((genre) => (<option value={genre._id}>{genre.genreName}</option>))
           }  
         </Form.Select>
-        <Button onClick={()=>EditGenreBtn(selectedGenre)}>Edit</Button></>) :(<>
+        <Form.Text id="passwordHelpBlock" muted>{selectedGenre}</Form.Text>
+        <Row style={{justifyContent:'space-evenly'}}>
+        <Button onClick={()=>EditGenreBtn(selectedGenre)} variant="dark" style={{width:'50%',marginTop:'13%',}} >Edit</Button></Row></>) :(<>
           <Form.Group style={{marginBottom:10}}>
-<Form.Control type="text" value={genreName} onChange={(e)=>setGenreName(e.target.value)} placeholder="Enter genre name" />
+          <FloatingLabel label="Genre name">
+<Form.Control type="text" value={genreName} onChange={(e)=>setGenreName(e.target.value)} placeholder="Enter genre name" /></FloatingLabel>
 </Form.Group>
-<Form.Control type="textarea" value={genreDesc} onChange={(e)=>setGenreDesc(e.target.value)} placeholder="genre description" />
+<FloatingLabel label="Genre description">
+<Form.Control type="textarea" value={genreDesc} onChange={(e)=>setGenreDesc(e.target.value)} placeholder="genre description" /></FloatingLabel>
 <Form.Group className="mb-3" controlId="formBasicCheckbox">
 </Form.Group>
 <Row style={{justifyContent:'space-evenly'}}>
-          <Button variant="dark" onClick={()=>setGenreEditBtn(!genreEditBtn)} style={{width:'25%'}}>Back</Button><Button style={{width:'25%'}} onClick={updateGenre}>Save</Button></Row>
+          <Button variant="dark" onClick={()=>setGenreEditBtn(!genreEditBtn)} style={{width:'25%'}}>🡰</Button><Button variant='success'style={{width:'25%'}} onClick={updateGenre}>✔</Button></Row>
         </>)
       }
       

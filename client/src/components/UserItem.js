@@ -28,7 +28,7 @@ const UserItem = props =>{
         } */}
           </Container>
           <Row style={{justifyContent:'space-evenly',marginTop:10}}>
-          <Button variant='dark' style={{width:'30%'}}>Edit</Button>{props.user.isAdmin ? (<Button disabled style={{width:'30%'}} variant='danger'>Delete</Button>):(<Button style={{width:'30%'}} variant='danger'>Delete</Button>)}
+          <Button variant='dark' style={{width:'30%'}}>📝</Button>{props.user.isAdmin ? (<Button disabled style={{width:'30%'}} variant='danger'>✘</Button>):(<Button style={{width:'30%'}} variant='danger'>Delete</Button>)}
           </Row>
         </Card.Body>
         

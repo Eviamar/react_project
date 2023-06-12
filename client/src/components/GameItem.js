@@ -20,17 +20,22 @@ const GameItem = props =>{
 
 
   const updateGame = async()=>{
-    const response = await fetch(baseUrl+"/updateGame/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-          gameName: GameName,
-          gameDesc: GameDesc,
-          gameRating: GameRating,
-          gamePrice: GamePrice,
-          gameReleaseDate: GameReleaseDate,
-          gameImage: GameImage
-    })});
-    const data = await response.json(); 
-    setIsEditable(false);
-    props.loadAllGames();
+    try{
+      const response = await fetch(baseUrl+"/updateGame/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        gameName: GameName,
+        gameDesc: GameDesc,
+        gameRating: GameRating,
+        gamePrice: GamePrice,
+        gameReleaseDate: GameReleaseDate,
+        gameImage: GameImage
+  })});
+  const data = await response.json(); 
+  setIsEditable(false);
+  props.loadAllGames();
+    }catch(error){
+     console.log(error)
+    }
+   
   }
     return(
         <>
@@ -91,7 +96,7 @@ const GameItem = props =>{
                     <Row>
                   </Row>
                   <Row style={{justifyContent:'space-evenly'}}>
-                  <Button variant='dark'  onClick={() => setIsEditable(!isEditable)} style={{width:'25%'}}>Back</Button><Button variant="success" style={{width:'25%'}} onClick={updateGame}>Save</Button>
+                  <Button variant='dark'  onClick={() => setIsEditable(!isEditable)} style={{width:'25%'}}>🡰</Button><Button variant="success" style={{width:'25%'}} onClick={updateGame}>✔</Button>
                   </Row>
                   </Container>
                 </Card.Body>
@@ -182,7 +187,7 @@ const GameItem = props =>{
                     <Row>
                   </Row>
                   <Row style={{justifyContent:'space-evenly'}}>
-                  <Button variant='dark' onClick={() =>setIsEditable(!isEditable)} style={{width:'20%'}}>&#128196;</Button><Button variant='danger' style={{width:'20%'}} onClick={props.Delete}>🗑</Button>
+                  <Button variant='dark' onClick={() =>setIsEditable(!isEditable)} style={{width:'20%'}}>📝</Button><Button variant='danger' style={{width:'20%'}} onClick={props.Delete}>✘</Button>
                   </Row>
                   </Container>
                 </Card.Body>

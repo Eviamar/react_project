@@ -16,17 +16,21 @@ const GameComponent = (props) =>{
     const [userRating,setUserRating] = useState(0);
     const [addReview,setAddReview] = useState(false);
     const Rate = Array.from({length: 10}, (_, i) => i + 1);
-    const [userName,setUserName] = useState(""); 
+    // const [userName,setUserName] = useState(""); 
 
 
 
     const GetGameData = async()=>{
+      try{
     const response = await fetch(baseUrl+"/readGameById/"+props.game._id,{method:'GET'});
     const data = await response.json();
     setGame(data.message);
     const date = new Date(data.message.gameReleaseDate);
     setGameDate(date.toLocaleDateString('en-GB').toString());
-    
+  }
+  catch(error){
+    console.log(error)
+  }
     }
     
     //const [totalItems,setTotalItems] = useState([]);
@@ -37,6 +41,7 @@ const GameComponent = (props) =>{
     localStorage.setItem("Cart",[localStorage.Cart,JSON.stringify(item._id)]);
     //console.log("TotalItems=>"+totalItems);
     console.log("Cart=>"+localStorage.getItem("Cart"));
+    toast.success(`${item.gameName} Added to cart`);
     
  
     }
@@ -56,28 +61,34 @@ const GameComponent = (props) =>{
       return false;
     }
     const CommitReview = async()=>{
+      try{
+        const response = await fetch(baseUrl+"/AddReview/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          userAuthor: JSON.parse(localStorage.getItem("user"))._id,
+          title: title,
+          review:review,
+          userRating:parseInt(userRating)
+              
+        })});
+        const data = await response.json(); 
+        toast.success("Review saved, thank you")
+        setAddReview(!addReview);
+      }catch(error){
+        console.log(error)
+      }
       
-      const response = await fetch(baseUrl+"/AddReview/"+props.game._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        userAuthor: JSON.parse(localStorage.getItem("user"))._id,
-        title: title,
-        review:review,
-        userRating:parseInt(userRating)
-            
-      })});
-      const data = await response.json(); 
-      toast.success("Review saved, thank you")
-      setAddReview(!addReview);
     }
 
-const GetUserNameByID=async(uid)=>{
-  const response = await fetch(baseUrl+"/account/readUserByID"+uid,{method:'GET'});
-    const data = await response.json();
-    console.log("username"+data.message.userName)
-    return data.message.userName;
-    //console.log(users);
-}
+// const GetUserNameByID=async(uid)=>{
+//   const response = await fetch(baseUrl+"/account/readUserByID"+uid,{method:'GET'});
+//     const data = await response.json();
+//     console.log("username"+data.message.userName)
+//     return data.message.userName;
+//     //console.log(users);
+// }
+
     return(
 <>
+<ToastContainer/>
 {
     game && (
       <Card style={{ marginTop:10,marginBottom:10,borderWidth:1,borderColor:'#000',boxShadow:10,boxShadow: '1px 1px 12px #000'}}>
@@ -87,9 +98,9 @@ const GetUserNameByID=async(uid)=>{
         <Card.Img style={{height:150,borderBottomLeftRadius:0,borderBottomRightRadius:0,}} src={game.gameImageCover} />
         <Card.ImgOverlay>
          <Row xl={12}style={{width:'100%',height:"100%",}}>
-          <Col xl={8} > <Card.Text style={{fontSize:26,color:'white',fontWeight:'800',textShadow:'1px 3px 3px #000',borderRadius:6,}}>
+          <Col xl={8} > <Card.Text style={{fontSize:26,color:'white',fontWeight:'800',textShadow:'2px 3px #000',WebkitTextStroke:'1px #000',borderRadius:6,}}>
             {game.gameName}</Card.Text></Col>
-          <Col xl={4}> <Card.Text style={{fontSize:18,color:'white',fontWeight:'800',textShadow:'1px 3px 3px #000',borderRadius:6,textAlign:'right'}}>&#65284;{game.gamePrice}</Card.Text>
+          <Col xl={4}> <Card.Text style={{fontSize:25,color:'lime',fontWeight:'800',borderRadius:6,textAlign:'right',WebkitTextStroke:'2px #000'}}>${game.gamePrice}</Card.Text>
           </Col>
           </Row>
             </Card.ImgOverlay>
@@ -97,22 +108,22 @@ const GetUserNameByID=async(uid)=>{
             <Container >
             <Row >
               <Col>
-              <Card.Text style={{fontSize:16,fontWeight:'bold',textShadow:'1px 3px 3px #bebebe'}}>
+              <Card.Text style={{textAlign:'center',fontSize:16,fontWeight:'bold',textShadow:'1px 3px 3px #bebebe'}}>
               Release Date
               </Card.Text>
               </Col>
               <Col>
-              <Card.Text style={{fontSize:16,textAlign:'right',fontWeight:'bold',textShadow:'1px 3px 3px #bebebe'}}>
+              <Card.Text style={{fontSize:16,textAlign:'center',fontWeight:'bold',textShadow:'1px 3px 3px #bebebe'}}>
               Rating
               </Card.Text>
               </Col>
             </Row>
             <Row >
               <Col style={{width:'80%',}} >
-        <Card.Text style={{fontSize:13,}}>{gameDate}</Card.Text>
+        <Card.Text style={{fontSize:13,textAlign:'center'}}>{gameDate}</Card.Text>
         </Col>
         <Col style={{width:'30%' ,}}>
-         <Card.Text style={{fontSize:13,textAlign:'right'}}>{isNaN(props.game.gameRating/props.game.gameRaters) ?(<>0</>) :(<>{props.game.gameRating/props.game.gameRaters}</>)}&#127942;</Card.Text>
+         <Card.Text style={{fontSize:13,textAlign:'center'}}>{isNaN(props.game.gameRating/props.game.gameRaters) ?(<>0</>) :(<>{props.game.gameRating/props.game.gameRaters}</>)}&#127942;</Card.Text>
          </Col>
         </Row>
         </Container>
@@ -121,15 +132,17 @@ const GetUserNameByID=async(uid)=>{
                             //if user already commited review
                            addReview && reviewBtnDisabled ? 
                            (<>
-                          <Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double'}}>
+                          <Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double',}}>
                           {
                             allReviews.length>0 && allReviews.map((review)=>(
                               <Carousel.Item  style={{width:"100%",height:150,}}>
-                            <Card style={{backgroundColor:'#bebebebe'}}>
-                              <Card.Body>
-                                <Card.Title>Title: {review.title}</Card.Title>
-                                <Card.Text>Rating: {review.userRating}</Card.Text>
-                                <textarea disabled style={{resize:'none'}} value={review.review}></textarea>
+                            <Card style={{backgroundColor:'#bebebebe',borderRadius:0,height:150}}>
+                              <Card.Body style={{textAlign:'center'}}>
+                               
+                                <Card.Title style={{textDecoration:' underline dotted #2c8fe6',fontSize:23,fontWeight:'650',marginTop:'-7%',textShadow:'2px 0px white'}}>{review.title}</Card.Title>
+                                <Card.Text style={{fontSize:15,fontWeight:'800',textShadow:'1px 1px 10px gold'}}>{review.userRating}🏆</Card.Text>
+                               
+                                <textarea disabled style={{color:'#000',resize:'none',width:'100%',height:80,borderRadius:8,marginTop:'-5%',textAlign:'center',}} value={review.review}></textarea>
                                 </Card.Body></Card></Carousel.Item>
                                 ))
                           }
@@ -153,14 +166,14 @@ const GetUserNameByID=async(uid)=>{
                           }
                 </Form.Select></Col></Row>
                 
-                          <textarea style={{width:'100%',resize:"none",height:'74%'}} type="text" placeholder='Review' onChange={(e)=>setReview(e.target.value)}/>
+                          <textarea style={{width:'100%',resize:"none",height:'74%',}} type="text" placeholder='Review' onChange={(e)=>setReview(e.target.value)}/>
                           
                           
                           </Form>
                           </div> </>) :
                           (<><Carousel style={{borderBottomWidth:5,borderTopWidth:5,borderBottomStyle:'double',borderTopStyle:'double'}}>
         {
-          game.gameGallery && (game.gameGallery.map((pic)=><Carousel.Item style={{width:"100%",height:150,}}><Card.Img style={{borderRadius:0, height:150}}src={pic.imageSource}  onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>
+          game.gameGallery && (game.gameGallery.map((pic)=><Carousel.Item style={{width:"100%",height:150,}}><Card.Img style={{borderRadius:0, height:150,cursor:'pointer'}}src={pic.imageSource}  onClick={()=>{window.open(pic.imageSource,'_blank',)}}/>
           </Carousel.Item>
           ))
         }
@@ -180,8 +193,8 @@ const GetUserNameByID=async(uid)=>{
                        (<>
 
                         {
-                          addReview && reviewBtnDisabled ? (<><Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button></>) : (<><Row style={{justifyContent:'space-evenly'}}>
-                          <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>←</Button><Button  style={{width:'30%'}} variant='success' onClick={CommitReview} disabled={reviewBtnDisabled}>&#x2714;</Button>
+                          addReview && reviewBtnDisabled ? (<><Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>🡰</Button></>) : (<><Row style={{justifyContent:'space-evenly'}}>
+                          <Button variant='dark' onClick={()=>setAddReview(!addReview)} style={{width:'30%'}}>🡰</Button><Button  style={{width:'30%'}} variant='success' onClick={CommitReview} disabled={reviewBtnDisabled}>&#x2714;</Button>
                         </Row></>)
                         }
                         

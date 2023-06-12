@@ -17,8 +17,8 @@ const Header = props =>{
   
     return(
         <Navbar bg="light" expand="lg">
-      <Container>
-      <img src={logo} alt="logo" style={{width:150,marginRight:'5%'}} onClick={()=>{navigate('/dashboard')}} />
+      <Container >
+      <img src={logo} alt="logo" style={{width:150,marginRight:'5%',cursor:'pointer'}} onClick={()=>{navigate('/dashboard')}} />
         <Navbar.Brand>{user && (<><p style={{fontSize:15,textAlign:'center',marginTop:20}}>Hello, {user.firstName}</p></>)}</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

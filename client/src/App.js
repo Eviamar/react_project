@@ -20,9 +20,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Login/>}/>
             <Route path="/dashboard" exact element={user ? (<Dashboard/>) : (<Login/>)}/>
-            <Route path="/game" element={user ? (<></>):(<Login/>)}/>
             <Route path="/cart" element={user ? (<Cart></Cart>):(<Login/>)}/>
-            <Route path="/gamesgallery"  element={user ? (<></>):(<Login/>)}/>
             <Route path="/settings" exact element={user ? (<Settings/>) : (<Login/>)}/>
             <Route path="/admin" exact element={user ? ( user.isAdmin ? (<AdminPage/>) : (<Dashboard/>)) : (<Login/>)}/>
             <Route path="/*" element={<NotFound/>}/>

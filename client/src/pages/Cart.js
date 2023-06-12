@@ -45,22 +45,27 @@ const Cart = props => {
 
 const PurchaseMethod=async()=>
 {
-    for(let i = 0; i< cartItems.length;i++){
-       console.log(cartItems[i]._id)
-        const response = await fetch(baseUrl+"/account/addGameToCollection/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-            "gameId": cartItems[i]._id
-      })});
-      const data = await response.json().then(result=>{
-        
-      }) 
-      .catch(error=>{
-        toast.error(error.message)
-      })
-      //user = JSON.parse(localStorage.getItem("user"));
-     
-      localStorage.removeItem("Cart");
-    } 
-    toast.success("Purchased done, thank you!")
+    try{
+        for(let i = 0; i< cartItems.length;i++){
+            console.log(cartItems[i]._id)
+             const response = await fetch(baseUrl+"/account/addGameToCollection/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+                 "gameId": cartItems[i]._id
+           })});
+           const data = await response.json().then(result=>{
+             
+           }) 
+           .catch(error=>{
+             toast.error(error.message)
+           })
+           //user = JSON.parse(localStorage.getItem("user"));
+          
+           localStorage.removeItem("Cart");
+         } 
+         toast.success("Purchased done, thank you!")
+    }catch(error){
+     console.log(error)
+    }
+    
 }
 const RemoveItem=(item)=>{
     console.log(item._id)
@@ -91,7 +96,7 @@ const EmptyCart =() =>{
                         <Card>
                         <Card.Body>
                             <Card.Img  style={{height:100,borderBottomLeftRadius:0,borderBottomRightRadius:0,}} src={item.gameImageCover}/>
-                            <Card.ImgOverlay style={{textAlign:'right'}}><Button variant='danger' style={{textShadow:'0px 0px 4px #cc0000',borderRadius:0,borderBottomLeftRadius:8,}} onClick={()=>RemoveItem(item)}>🗑</Button></Card.ImgOverlay>
+                            <Card.ImgOverlay style={{textAlign:'right'}}><Button variant='danger' style={{textShadow:'0px 0px 4px #cc0000',borderRadius:0,borderBottomLeftRadius:8,}} onClick={()=>RemoveItem(item)}>✘</Button></Card.ImgOverlay>
                             <Card.Title>Game: {item.gameName}</Card.Title>
                             <Card.Title>Price: {item.gamePrice}</Card.Title>
                             

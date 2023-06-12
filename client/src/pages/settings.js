@@ -48,45 +48,56 @@ const Settings = props => {
     }
 
     const updateUserImage = async()=>{
-   
-      const response = await fetch(baseUrl+"/account/updateUserImage/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-         avatar: avatar,
-   })});
-   const data = await response.json(); 
-   //user = JSON.parse(localStorage.getItem("user"));
-   loadUserData(user._id);
-   toast.success("changed")
- setIsEditable(false);
+   try{
+    const response = await fetch(baseUrl+"/account/updateUserImage/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      avatar: avatar,
+})});
+const data = await response.json(); 
+//user = JSON.parse(localStorage.getItem("user"));
+loadUserData(user._id);
+toast.success("changed")
+setIsEditable(false);
+   }catch(error){
+    console.log(error)
+   }
+    
  
 }
-    const updateUser = async()=>{
-       
-             const response = await fetch(baseUrl+"/account/updateUser/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                mobile: mobile,
-                //password:newPassword
-          })});
-          const data = await response.json(); 
-          user = JSON.parse(localStorage.getItem("user"));
-          loadUserData(user._id);
-          toast.success("changed")
-        setIsEditable(false);
-        
+    const updateUser = async()=>{  
+ try{
+  const response = await fetch(baseUrl+"/account/updateUser/"+user._id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    mobile: mobile,
+    //password:newPassword
+})});
+const data = await response.json(); 
+user = JSON.parse(localStorage.getItem("user"));
+loadUserData(user._id);
+toast.success("changed")
+setIsEditable(false);
+ }catch(error){
+  console.log(error)
+ }       
       }
 
     const loadUserData = async(gid)=>
     {
-      const response = await fetch(baseUrl+"/account/readUserByID/"+gid,{method:'GET'});
-      const data = await response.json();
-      setUserData(data.message);
-      //console.log("LoadUserData===>"+JSON.stringify(userData));
+      try{
+        const response = await fetch(baseUrl+"/account/readUserByID/"+gid,{method:'GET'});
+        const data = await response.json();
+        setUserData(data.message);
+        //console.log("LoadUserData===>"+JSON.stringify(userData));
+        
+      //   setFirstName(userData.firstName);
+      //   setLastName(userData.lastName);
+      //   setEmail(userData.email);
+      //   setMobile(userData.mobile);
+      }catch(error){
+       console.log(error)
+      }
       
-    //   setFirstName(userData.firstName);
-    //   setLastName(userData.lastName);
-    //   setEmail(userData.email);
-    //   setMobile(userData.mobile);
     }
 
     useEffect(()=>{
@@ -113,7 +124,7 @@ const Settings = props => {
         <Card.Img style={{width:150,height:150,borderTopRightRadius:0,borderBottomLeftRadius:0}}  src={userData.avatar}/>
         <label>Choose new avatar</label>
         <Form.Control type="file" accept="image/*" name="gameImageCover" onChange={(e)=>{uploadUserImage(e)}} />
-        <Button variant="success" style={{marginTop:10}} onClick={updateUserImage}>Save avatar</Button> 
+        <Button variant="success" style={{marginTop:10}} onClick={updateUserImage}>✔Save avatar✔</Button> 
         </Col>
         <Col xl={9}>
         <Card.Body >
@@ -125,7 +136,7 @@ const Settings = props => {
           <Form.Control type="text" value={lastName} onChange={(e)=>{setLastName(e.target.value)}} placeholder='Last name' style={{marginTop:10}}/>
           <Form.Control type="email" value={email} onChange={(e)=>{setEmail(e.target.value)}} placeholder='Email' style={{marginTop:10}}/>
           <Form.Control type="phone" value={mobile} onChange={(e)=>{setMobile(e.target.value)}} placeholder='Mobile' style={{marginTop:10}}/>
-          <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{marginTop:10}}>Save info</Button>
+          <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{marginTop:10}}>✔Save info✔</Button>
           </Col>
           {/* <Col xl={2}>
             <Row>
@@ -148,7 +159,7 @@ const Settings = props => {
         </Row>
       </Card>
       <Row style={{justifyContent:'center'}}>
-      <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{width:'15%'}}>« Back</Button>
+      <Button variant="primary" onClick={() => setIsEditable(!isEditable)} style={{width:'15%'}}>🡰</Button>
       </Row>
        
             </>
